@@ -2,3 +2,5 @@
 Version=14.1
 [WorkspacePaths]
 ConfigFile=.\Programs\Config.ws
+[Projects]
+Project0=Crystal2XML.src
