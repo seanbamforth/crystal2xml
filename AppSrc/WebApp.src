@@ -1,0 +1,21 @@
+Use AllWebAppClasses.pkg
+
+Object oApplication is a cApplication
+End_Object
+
+Object oWebApp is a cWebApp
+    Use Test.wo
+
+    //    Procedure OnattachProcess
+    //       // perform any initialization for the newly attached process.
+    //       Showln "attach"
+    //    End_Procedure
+
+    //    Procedure OnDetachProcess
+    //       // perform any de-initialization for the process that is being detached.
+    //       Showln "detach"
+    //    End_Procedure
+
+End_Object
+
+Send StartWebApp of oWebApp

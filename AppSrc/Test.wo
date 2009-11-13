@@ -1,0 +1,36 @@
+Use cWebService.pkg
+Use cFlagsDataDictionary.dd
+
+Struct tTest 
+    String Name 
+    String Postcode
+End_Struct
+
+Object oTest is a cWebService
+    Object oFlags_DD is a cFlagsDataDictionary
+    End_Object
+
+    Set Main_DD to oFlags_DD
+    
+    // psDocumentation provides high level documentation of your web service. 
+    // Clients using this service will see and use this documentation. 
+    Set psDocumentation to ;
+        ("Visual DataFlex Web Service .... " +;
+          " ... " +  ;
+          "documentation")
+    
+    { Published = True  }
+    { Description = "Just testing how struct gets converted to XML"  }
+    Function HowsItWork Returns tTest 
+        tTest TestVar
+        
+        Move "sean" to TestVar.Name
+        Move "This is it" to TestVar.Postcode
+
+        Function_Return TestVar
+    End_Function
+    
+    
+End_Object
+
+

@@ -1,0 +1,26 @@
+Use Batchdd.pkg
+
+Struct tXMLCrystalReport 
+    String ReportName 
+    String LastEditedBy
+    //the rest of the report structure needs to go in here. 
+End_Struct
+
+
+Object oReportNotifier is a BusinessProcess
+    
+    Function ReportDetail String sReport Returns tXMLCrystalReport 
+        tXMLCrystalReport XMLReport
+        
+        Move sReport to XMLReport.ReportName
+        Move "Testing" to XMLReport.LastEditedBy
+        
+        Function_Return XMLReport
+    End_Function
+    
+
+    Procedure OnProcess
+    End_Procedure
+
+End_Object
+

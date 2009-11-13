@@ -1,0 +1,495 @@
+Compiling Program: E:\vdf14.1\Crystal2XML\AppSrc\WebApp.src
+Memory Available: 2053988351
+1>Use AllWebAppClasses.pkg
+Using pre-compiled package ALLWEBAPPCLASSES.PKG
+Including file: AllWebAppClasses.pkd    (C:\Program Files (x86)\Visual DataFlex 14.1\Pkg\AllWebAppClasses.pkd)
+12881>
+12881>Object oApplication is a cApplication
+12883>End_Object
+12884>
+12884>Object oWebApp is a cWebApp
+12886>    Use Test.wo
+Including file: Test.wo    (E:\vdf14.1\crystal2xml\AppSrc\Test.wo)
+12886>>>Use cWebService.pkg
+Including file: cWebService.pkg    (C:\Program Files (x86)\Visual DataFlex 14.1\Pkg\cWebService.pkg)
+12886>>>>>Use Windows.pkg
+12886>>>>>Use Flexml.pkg
+12886>>>>>Use Set.pkg
+12886>>>>>
+12886>>>>>Use cCallInterface.pkg
+12886>>>>>Use cCallInterfaceHelper_mixin.pkg
+12886>>>>>Use SoapConstants.pkg
+Including file: SoapConstants.pkg    (C:\Program Files (x86)\Visual DataFlex 14.1\Pkg\SoapConstants.pkg)
+12886>>>>>>>// SoapConstants.pkg
+12886>>>>>>>// constants used by soap
+12886>>>>>>>
+12886>>>>>>>// DataFlex datatypes that we support in soap.
+12886>>>>>>>// These MUST match the dataflex definitions as provided in fmac
+12886>>>>>>>Enum_list
+12886>>>>>>>    Define xsString    for 0
+12886>>>>>>>    Define xsNumber    for 1
+12886>>>>>>>    Define xsDate      for 2
+12886>>>>>>>    Define xsInteger   for 3
+12886>>>>>>>    Define xsBigint    for 4
+12886>>>>>>>    Define xsReal      for 5
+12886>>>>>>>    Define xsBoolean   for 6
+12886>>>>>>>    Define xsTime      for 8
+12886>>>>>>>    Define xsDatetime  for 9
+12886>>>>>>>    Define xsFloat     for 10
+12886>>>>>>>    Define xsChar      for 11
+12886>>>>>>>    Define xsUchar     for 12
+12886>>>>>>>    Define xsShort     for 13
+12886>>>>>>>    Define xsUShort    for 14
+12886>>>>>>>    Define xsUinteger  for 15
+12886>>>>>>>    Define xsUbigint   for 17
+12886>>>>>>>    Define xsCurrency  for 18
+12886>>>>>>>    Define xsStruct    for 19
+12886>>>>>>>    Define xsDecimal   for 22
+12886>>>>>>>
+12886>>>>>>>    Define xsEmpty     for  -1  // not a real datatype. Used with return types when nothing is returned. We must use -1 (the runtime message InterfaceMessageParamType returns this)
+12886>>>>>>>    Define xsAnyType    for 127  // not a real type (represent as XML within a wrapper document)
+12886>>>>>>>    Define xsXmlElement for 128  // not a real type (represent as an xml document. <any /> type in schema)
+12886>>>>>>>
+12886>>>>>>>End_Enum_list
+12886>>>>>>>
+12886>>>>>>>// soap style
+12886>>>>>>>Enum_list
+12886>>>>>>>   define ssDocument
+12886>>>>>>>   define ssRPC
+12886>>>>>>>End_Enum_list
+12886>>>>>>>
+12886>>>>>>>// soap encoding
+12886>>>>>>>Enum_list
+12886>>>>>>>   define seLiteral
+12886>>>>>>>   define seEncoded
+12886>>>>>>>End_Enum_list
+12886>>>>>>>
+12886>>>>>>>// service/port-types. Currently we only support soap
+12886>>>>>>>Enum_list
+12886>>>>>>>   define ptUnKnown
+12886>>>>>>>   define ptSOAP
+12886>>>>>>>   define ptHttp
+12886>>>>>>>End_Enum_list
+12886>>>>>>>
+12886>>>>>>>// SOAP URI constants
+12886>>>>>>>define C_WSDLURI              for "http://schemas.xmlsoap.org/wsdl/"
+12886>>>>>>>define C_SOAPURI              for "http://schemas.xmlsoap.org/wsdl/soap/"
+12886>>>>>>>define C_XMLSCHEMAURI         for "http://www.w3.org/2001/XMLSchema"
+12886>>>>>>>define C_XMLSCHEMAXSIURI      for "http://www.w3.org/2001/XMLSchema-instance"
+12886>>>>>>>define C_SOAPENVELOPEURI      for "http://schemas.xmlsoap.org/soap/envelope/"
+12886>>>>>>>define C_SOAPENCODINGURI      for "http://schemas.xmlsoap.org/soap/encoding/"
+12886>>>>>>>
+12886>>>>>>>// .net uses a document style name of parameter to indicate wrap style, else bar
+12886>>>>>>>define C_ParameterNameBare    for "parameters"
+12886>>>>>>>define C_UnBounded            for -1 // used when maxOccurs=Unbounded
+12886>>>>>>>
+12886>>>>>>>
+12886>>>>>Use LanguageTextWebApp.pkg
+12886>>>>>
+12886>>>>>Class cWebService is a cObject
+12887>>>>>
+12887>>>>>    Procedure Construct_Object
+12889>>>>>        Forward Send Construct_Object
+12891>>>>>        String sWSOName
+12891>>>>>        Forward Send Construct_Object
+12893>>>>>
+12893>>>>>        Property Handle  Main_DD                 0
+12894>>>>>        Property String  psDescription           ""
+12895>>>>>        Property String  psServiceName           "tempService"
+12896>>>>>        Property String  psServiceURI            "http://tempuri.org/"
+12897>>>>>        Property String  psServiceTitle          "Visual DataFlex Web Service"
+12898>>>>>        Property String  psDocumentation         ""
+12899>>>>>        Property Boolean pbDocumentStyle        True // if True document, false RPC
+12900>>>>>
+12900>>>>>        Property string  psWebServiceMetaDataURI "http://www.dataaccess.com/schemas/WebServiceMetaData"
+12901>>>>>
+12901>>>>>        // This will only happen if there is a programming class bug
+12901>>>>>        If (ghInetSession=0) Begin
+12903>>>>>            Error DFERR_PROGRAM C_$MissingISO
+12904>>>>>>
+12904>>>>>            Abort
+12905>>>>>>
+12905>>>>>        End
+12905>>>>>>
+12905>>>>>
+12905>>>>>        // register object as a WebService
+12905>>>>>        Get Object_Label To sWSOName
+12906>>>>>        Send Set_Wso_Data To ghInetSession sWSOName self
+12907>>>>>
+12907>>>>>
+12907>>>>>        // creates call interface object and message support for this class including
+12907>>>>>        // register interface.
+12907>>>>>        // all access is through property phoCallInterface
+12907>>>>>        Send DefineCallInterfaceHelper_mixin
+12908>>>>>        // Tells callInterface to do datatype conversions with XML data
+12908>>>>>        Set pbConvertXML to True
+12909>>>>>
+12909>>>>>    End_Procedure  //Construct_Object
+12910>>>>>
+12910>>>>>    Import_class_protocol cCallInterfaceHelper_mixin
+12911>>>>>
+12911>>>>>    // A web-service exception (soap fault) is generated by calling this message with
+12911>>>>>    // error text and then exiting the function.
+12911>>>>>
+12911>>>>>    Procedure WebServiceException string sError
+12913>>>>>        send WebServiceException of oCallInterface sError
+12914>>>>>    end_procedure
+12915>>>>>
+12915>>>>>
+12915>>>>>    // These three messages are directed from the callinterface object to here via the
+12915>>>>>    // phoWebServiceImplementor property. This means that WOs handle this making it easier
+12915>>>>>    // to augment
+12915>>>>>
+12915>>>>>    Function DeserializeXml Address aXml string sDataType Returns Handle
+12917>>>>>        Integer hoXml
+12917>>>>>        Get Create U_cXmlDomDocument to hoXml
+12918>>>>>        Get LoadXmlFromAddress of hoXml aXml to windowindex
+12919>>>>>        Function_Return hoXml
+12920>>>>>    End_Function
+12921>>>>>
+12921>>>>>    Function SerializeXml Handle hObj string sDataType Returns Address
+12923>>>>>        Address aXml
+12923>>>>>        if (hObj);            Get paXml of hObj to aXml
+12926>>>>>        Function_Return aXml
+12927>>>>>    End_Function
+12928>>>>>
+12928>>>>>    Procedure DisposeObject Handle hObj
+12930>>>>>        if (hObj);            Send Destroy of hObj
+12933>>>>>    End_Procedure
+12934>>>>>
+12934>>>>>    Procedure LogEvent Integer iEventType String lpszEvent
+12936>>>>>        Send LogEvent To ghInetSession iEventType lpszEvent
+12937>>>>>        End_Procedure
+12938>>>>>
+12938>>>>>    Procedure LogErrorEvent Integer iErr String sText
+12940>>>>>       Send LogErrorEvent To ghInetSession iErr sText
+12941>>>>>    End_Procedure
+12942>>>>>
+12942>>>>>    // Pass these properties to ISO. This makes it easier to debug
+12942>>>>>
+12942>>>>>    //{ MethodType=Property }
+12942>>>>>//    Function pbVerboseErrors Returns Integer
+12942>>>>>//       Function_Return (pbVerboseErrors(ghInetSession))
+12942>>>>>//    End_Function
+12942>>>>>
+12942>>>>>//    //Doc/ Visibility=Public MethodType=Property
+12942>>>>>//    Procedure Set pbVerboseErrors Integer bState
+12942>>>>>//       Set pbVerboseErrors Of ghInetSession To bState
+12942>>>>>//    End_Procedure
+12942>>>>>
+12942>>>>>    Function pbAllErrorsToEventLog Returns Integer
+12944>>>>>       Function_Return (pbAllErrorstoEventLog(ghInetSession))
+12945>>>>>    End_Function
+12946>>>>>
+12946>>>>>    Procedure Set pbAllErrorsToEventLog Integer bState
+12948>>>>>       Set pbAllErrorstoEventLog Of ghInetSession To bState
+12949>>>>>    End_Procedure
+12950>>>>>
+12950>>>>>    Function pbAllErrorsToLocal Returns Integer
+12952>>>>>       Function_Return (pbAllErrorstoLocal(ghInetSession))
+12953>>>>>    End_Function
+12954>>>>>
+12954>>>>>    Procedure Set pbAllErrorsToLocal Integer bState
+12956>>>>>       Set pbAllErrorstoLocal Of ghInetSession To bState
+12957>>>>>    End_Procedure
+12958>>>>>
+12958>>>>>    Procedure AddServiceTypeDefinitions handle hoRoot string sNSPre string sNsURI
+12960>>>>>        String sXml
+12960>>>>>        Handle hoXml hoDoc
+12960>>>>>        Boolean bOk
+12960>>>>>        Get InterfaceTypeDefinitions sNsPre sNsURI to sXml
+12961>>>>>        Get Create U_cXmlDomDocument to hoXml
+12962>>>>>        Get LoadXml of hoXml sXml to bOk
+12963>>>>>        If (bOk) Begin
+12965>>>>>            Get DocumentElement of hoXml to hoDoc
+12966>>>>>            Get AppendNode of hoRoot hoDoc to bOk
+12967>>>>>            Send Destroy to hoDoc
+12968>>>>>        End
+12968>>>>>>
+12968>>>>>        Send Destroy to hoXml
+12969>>>>>    End_Procedure
+12970>>>>>
+12970>>>>>    Procedure AddServiceOperations handle hoRoot string sNSPre string sNsURI
+12972>>>>>        integer iCount iItem
+12972>>>>>        String sMethodName
+12972>>>>>        String sMethodType
+12972>>>>>        //String sParams
+12972>>>>>        String sComment
+12972>>>>>        Boolean bExtended
+12972>>>>>        handle hoOperation
+12972>>>>>
+12972>>>>>        Get InterfaceMessageCount to iCount
+12973>>>>>
+12973>>>>>        For iItem From 0 to (iCount-1)
+12979>>>>>>
+12979>>>>>
+12979>>>>>            Get InterfaceMessageIsExtended iItem to bExtended
+12980>>>>>            If not bExtended Begin
+12982>>>>>                Error DFERR_PROGRAM C_$ParamsMustBeExtended
+12983>>>>>>
+12983>>>>>                Procedure_return
+12984>>>>>            End
+12984>>>>>>
+12984>>>>>
+12984>>>>>            Get InterfaceMessageName       iItem to sMethodName
+12985>>>>>            //Get InterfaceMessageParams     iItem to sParams
+12985>>>>>            Get InterfaceMessageComment    iItem to sComment
+12986>>>>>
+12986>>>>>            If (sMethodName<>"get_WebServiceMetaData") Begin
+12988>>>>>                // Split the "raw" method name into sMethodType and
+12988>>>>>                // real method name. Raw method name is of the format:
+12988>>>>>                //    get_MethodName, set_MethodName or msg_MethodName.
+12988>>>>>                Move (lowercase(Left  (sMethodName, 3)))  To sMethodType
+12989>>>>>                Move (Remove(sMethodName, 1, 4))         To sMethodName
+12990>>>>>
+12990>>>>>                Get  AddElementNS of hoRoot sNsURI (sNSPre+"operation") "" to hoOperation
+12991>>>>>                Send AddAttribute of hoOperation "name"       sMethodName
+12992>>>>>                Send AddAttribute of hoOperation "methodType" sMethodType
+12993>>>>>                If (sComment<>"") Begin
+12995>>>>>                    Send AddElementNS of hoOperation sNsURI (sNSPre+"documentation") sComment
+12996>>>>>                end
+12996>>>>>>
+12996>>>>>
+12996>>>>>                //Send AddOperationParameters hoOperation sNSPre sNsURI sParams
+12996>>>>>                Send AddOperationParameters hoOperation sNSPre sNsURI iItem
+12997>>>>>                Send Destroy of hoOperation
+12998>>>>>            end
+12998>>>>>>
+12998>>>>>        Loop
+12999>>>>>>
+12999>>>>>     end_procedure
+13000>>>>>
+13000>>>>>    Procedure AddOperationParameters  Integer hoOperation String sNSPre string sNsURI Integer iMethodIndex
+13002>>>>>        Integer iParam iParamCount iParamType iDimCount
+13002>>>>>        Boolean bParamByRef
+13002>>>>>        String  sParamType sParamName
+13002>>>>>        Handle hoParam
+13002>>>>>        Get InterfaceMessageParamCount iMethodIndex to iParamCount
+13003>>>>>        For iParam from 0 to iParamCount
+13009>>>>>>
+13009>>>>>            Get InterfaceMessageParamType iMethodIndex iParam to iParamType
+13010>>>>>            Get InterfaceMessageParamTypeName iMethodIndex iParam to sParamType
+13011>>>>>            Get InterfaceMessageParamDimCount iMethodIndex iParam to iDimCount
+13012>>>>>            If (iParam=iParamCount) Begin
+13014>>>>>                // If the paramtype is xsNoParam (-1) then we don't have a return parameter (i.e., it's a procedure)
+13014>>>>>                If (iParamType<>xsEmpty) begin
+13016>>>>>                    //Return type
+13016>>>>>                    If (iParamType=xsStruct) Begin
+13018>>>>>                        Send AddAttribute of hoOperation "returnTypeRef" sParamType
+13019>>>>>                    End
+13019>>>>>>
+13019>>>>>                    Else Begin
+13020>>>>>                        Move (Lowercase(sParamType)) to sParamType
+13021>>>>>                        if (sParamType="xmlhandle");                            Move "xml" to sParamType
+13024>>>>>                        Send AddAttribute of hoOperation "returnType" sParamType
+13025>>>>>                    End
+13025>>>>>>
+13025>>>>>                    If (iDimCount) Begin
+13027>>>>>                        Send AddAttribute of hoOperation "returnTypeArrayDimCount" iDimCount
+13028>>>>>                    End
+13028>>>>>>
+13028>>>>>                End
+13028>>>>>>
+13028>>>>>            End
+13028>>>>>>
+13028>>>>>            Else Begin
+13029>>>>>                //Parameter
+13029>>>>>                Get  AddElementNS of hoOperation sNsURI (sNSPre+"parameter") "" to hoParam
+13030>>>>>                Get InterfaceMessageParamName iMethodIndex iParam to sParamName
+13031>>>>>                Send AddAttribute of hoParam  "name" sParamName
+13032>>>>>                If (iParamType=xsStruct) Begin
+13034>>>>>                    Send AddAttribute of hoParam  "typeRef" sParamType
+13035>>>>>                End
+13035>>>>>>
+13035>>>>>                Else Begin
+13036>>>>>                    Move (Lowercase(sParamType)) to sParamType
+13037>>>>>                    if (sParamType="xmlhandle");                        Move "xml" to sParamType
+13040>>>>>                    Send AddAttribute of hoParam  "type" sParamType
+13041>>>>>                End
+13041>>>>>>
+13041>>>>>                If (iDimCount) Begin
+13043>>>>>                    Send AddAttribute of hoParam "arrayDimCount" iDimCount
+13044>>>>>                End
+13044>>>>>>
+13044>>>>>                Get InterfaceMessageParamByRef iMethodIndex iParam to bParamByRef
+13045>>>>>                If (bParamByRef) Begin
+13047>>>>>                    Send AddAttribute of hoParam "byref" "true"
+13048>>>>>                End
+13048>>>>>>
+13048>>>>>                Send Destroy      of hoParam
+13049>>>>>            End
+13049>>>>>>
+13049>>>>>        Loop
+13050>>>>>>
+13050>>>>>    End_Procedure
+13051>>>>>
+13051>>>>>    // see WebServiceMetaData.xsd for a description of what needs to be generated here!
+13051>>>>>
+13051>>>>>    Function WebServiceMetaData Returns String
+13053>>>>>        String sWebServiceMetaDataURI sServiceURI sServiceTitle sDocumentation sServiceName
+13053>>>>>        String sXml
+13053>>>>>        handle hoXML hoRoot hoOperation hoParam
+13053>>>>>        string sNsPre
+13053>>>>>        Boolean bDocumentStyle
+13053>>>>>
+13053>>>>>        Get psWebServiceMetaDataURI to sWebServiceMetaDataURI
+13054>>>>>        Get psServiceName           to sServiceName
+13055>>>>>        Get psServiceURI            to sServiceURI
+13056>>>>>        Get psServiceTitle          to sServiceTitle
+13057>>>>>        Get psDocumentation         to sDocumentation
+13058>>>>>        Get pbDocumentStyle         to bDocumentStyle
+13059>>>>>
+13059>>>>>        Move "wso:" to sNsPre
+13060>>>>>        Get Create U_cXmlDomDocument to hoXml
+13061>>>>>        Get CreateDocumentElementNS of hoXml sWebServiceMetaDataURI (sNsPre+"webServiceObject") to hoRoot
+13062>>>>>        Send AddAttribute of hoRoot "name"      sServiceName
+13063>>>>>        Send AddAttribute of hoRoot "title"     sServiceTitle
+13064>>>>>        Send AddAttribute of hoRoot "namespace" sServiceURI
+13065>>>>>        Send AddAttribute of hoRoot "soapBodyStyle" (if(bDocumentStyle,"document","rpc"))
+13066>>>>>        Send AddElementNS of hoRoot sWebServiceMetaDataURI (sNsPre+"documentation") sDocumentation
+13067>>>>>        Send AddServiceTypeDefinitions hoRoot sNsPre sWebServiceMetaDataURI
+13068>>>>>        Send AddServiceOperations hoRoot sNsPre sWebServiceMetaDataURI
+13069>>>>>        Get  psXml   of hoRoot to sXml
+13070>>>>>        send destroy of hoRoot
+13071>>>>>        send destroy of hoXml
+13072>>>>>        Function_Return sXml
+13073>>>>>    End_Function
+13074>>>>>
+13074>>>>>    Function SoapHeaderRequestNode Returns Handle
+13076>>>>>        Address pVDFISData pData
+13076>>>>>        Integer iTemp
+13076>>>>>        Handle hoXml
+13076>>>>>        Boolean bOk bKeepAlive
+13076>>>>>        
+13076>>>>>        Get WebServiceRequestHeaders of ghInetSession to pVDFISData
+13077>>>>>        If (pVDFISData=0) Begin
+13079>>>>>            Send LogErrorEvent DFERR_WEBAPP_BAD_PARAMETER C_$pVDFISDataIsNull
+13080>>>>>            Function_Return 0
+13081>>>>>        End
+13081>>>>>>
+13081>>>>>
+13081>>>>>        Get VDFISData_pData pVDFISData to pData
+13082>>>>>        If (pData<>0) Begin
+13084>>>>>            Get Create of Desktop U_cXmlDomDocument to hoXml
+13085>>>>>            Get LoadXMLFromAddress of hoXml pData to bOk
+13086>>>>>            //TODO - Add the error message to language .inc file
+13086>>>>>            If (not(bOk));                Send LogErrorEvent DFERR_WEBAPP_BAD_PARAMETER C_$InvalidSOAPRequestHeader
+13089>>>>>
+13089>>>>>            Move (DeRefDW(pVDFISData, VDFISData.bKeepAlive)) to bKeepAlive
+13090>>>>>            If (not(bKeepAlive));                Move (Free(pData)) to iTemp
+13093>>>>>        End
+13093>>>>>>
+13093>>>>>        Move (Free(pVDFISData)) to iTemp
+13094>>>>>
+13094>>>>>        Function_Return hoXml
+13095>>>>>    End_Function
+13096>>>>>
+13096>>>>>    Procedure AddSoapHeaderNode Handle hoNode
+13098>>>>>        Address pData
+13098>>>>>        Boolean bOK
+13098>>>>>        
+13098>>>>>        // if node is not passed or it is not an element, this is an error
+13098>>>>>        If (hoNode=0 or piNodeType(hoNode)<>NODE_ELEMENT) Begin
+13100>>>>>            //TODO - Add the error message to language .inc file
+13100>>>>>            Send LogErrorEvent DFERR_WEBAPP_BAD_PARAMETER C_$CannotAddSOAPResponseHeader1
+13101>>>>>            Procedure_Return
+13102>>>>>        End
+13102>>>>>>
+13102>>>>>
+13102>>>>>        Get paXml of hoNode to pData
+13103>>>>>        // this should be very rare. For some reason an xml node of type element could not be converted to pData
+13103>>>>>        If (not(pData)) Begin
+13105>>>>>            //TODO - Add the error message to language .inc file
+13105>>>>>            Send LogErrorEvent DFERR_WEBAPP_BAD_PARAMETER C_$CannotAddSOAPResponseHeader2 
+13106>>>>>            Procedure_Return
+13107>>>>>        End
+13107>>>>>>
+13107>>>>>        Send AddWebServiceResponseHeader of ghInetSession pData
+13108>>>>>        Move (Free(pData)) to bOK
+13109>>>>>    End_Procedure
+13110>>>>>    
+13110>>>>>    Procedure End_Construct_Object
+13112>>>>>        Send RegisterInterface get_WebServiceMetaData "get_WebServiceMetaData" " Returns string" ""
+13113>>>>>        Forward send End_construct_object
+13115>>>>>    end_procedure
+13116>>>>>
+13116>>>>>End_Class
+13117>>>Use cFlagsDataDictionary.dd
+Including file: cFlagsDataDictionary.dd    (E:\vdf14.1\crystal2xml\DDSrc\cFlagsDataDictionary.dd)
+13117>>>>>Use DataDict.pkg
+13117>>>>>
+13117>>>>>Open Flags
+Including file: Flags.fd    (E:\vdf14.1\crystal2xml\DDSrc\Flags.fd)
+13119>>>>>
+13119>>>>>Class cFlagsDataDictionary is a DataDictionary
+13120>>>>>    
+13120>>>>>    Procedure Construct_Object
+13122>>>>>        Forward Send Construct_Object
+13124>>>>>        Set Main_file to Flags.File_Number
+13125>>>>>
+13125>>>>>        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+13126>>>>>        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+13127>>>>>        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+13128>>>>>        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+13129>>>>>
+13129>>>>>    End_Procedure
+13130>>>>>
+13130>>>>>End_Class
+13131>>>
+13131>>>Struct tTest 
+13131>>>    String Name 
+13131>>>    String Postcode
+13131>>>End_Struct
+13131>>>
+13131>>>Object oTest is a cWebService
+13133>>>    Object oFlags_DD is a cFlagsDataDictionary
+13135>>>    End_Object
+13136>>>
+13136>>>    Set Main_DD to oFlags_DD
+13137>>>    
+13137>>>    // psDocumentation provides high level documentation of your web service. 
+13137>>>    // Clients using this service will see and use this documentation. 
+13137>>>    Set psDocumentation to ;        ("Visual DataFlex Web Service .... " +;          " ... " +  ;          "documentation")
+13138>>>    
+13138>>>    Function HowsItWork Returns tTest 
+#REM SEND REGISTERINTERFACE |CI5485 "get_HowsItWork" "Returns tTest" "Just testing how struct gets converted to XML"
+13142>>>        tTest TestVar
+13142>>>        tTest TestVar
+13142>>>        
+13142>>>        Move "sean" to TestVar.Name
+13143>>>        Move "This is it" to TestVar.Postcode
+13144>>>
+13144>>>        Function_Return TestVar
+13145>>>    End_Function
+13146>>>    
+13146>>>    
+13146>>>End_Object
+13147>>>
+13147>>>
+13147>
+13147>    //    Procedure OnattachProcess
+13147>    //       // perform any initialization for the newly attached process.
+13147>    //       Showln "attach"
+13147>    //    End_Procedure
+13147>
+13147>    //    Procedure OnDetachProcess
+13147>    //       // perform any de-initialization for the process that is being detached.
+13147>    //       Showln "detach"
+13147>    //    End_Procedure
+13147>
+13147>End_Object
+13148>
+13148>Send StartWebApp of oWebApp
+13149>
+Summary
+Memory Available: 2050252799
+Total Warnings : 0
+Total Errors   : 0
+Total Symbols  : 10831
+Total Resources: 0
+Total Commands : 13148
+Total Windows  : 1
+Total Pages    : 1
+Static Data    : 103341
+Message area   : 76341
+Total Blocks   : 5974

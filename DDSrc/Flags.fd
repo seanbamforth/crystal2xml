@@ -1,0 +1,4 @@
+#REPLACE FILE1 Flags
+#REPLACE Flags.Recnum |FN1,0
+#REPLACE Flags.code |FS1,1
+#REPLACE Flags.value |FS1,2

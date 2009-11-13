@@ -1,0 +1,36 @@
+<OBJECT RUNAT=Server SCOPE=Session ID=WebAppServerSession PROGID="WebAppServer.Session.14.1">
+</OBJECT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Session_OnStart
+    WebAppServerSession.Initialize("StructToXML")
+    Session.Timeout=1
+
+    ' This defines the style to be used through out the application.
+    'Session("Style")="css/WebApp.css"
+    'Session("Style")="css/WebAppSample.css"
+    'Session("Style")="css/WebAppStyle1.css"
+    'Session("Style")="css/WebAppStyle2.css"
+    'Session("Style")="css/AppFocus.css"
+    'Session("Style")="css/TheBlues.css"
+    'Session("Style")="css/Comtempo.css"
+    'Session("Style")="css/Rustic.css"
+    'Session("Style")="css/WebSchema.css"
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Application_OnStart
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Application_OnEnd
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Session_OnEnd
+END SUB
+</SCRIPT>
+

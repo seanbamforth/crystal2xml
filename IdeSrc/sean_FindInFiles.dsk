@@ -1,0 +1,12 @@
+[Header]
+Mask=*.src;*.vw;*.sl;*.dg;*.rv;*.bp;*.pkg;*.wo;*.dd;*.inc;*.tpl;*.dfo;*.asp;*.asa;*.htm;*.html;*.css;*.js
+SubDirectories=1
+Location=E:\vdf14.1\crystal2xml\IdeSrc\sean_FindInFiles.dsk
+[E:\vdf14.1\Crystal2XML\AppSrc]
+IsEnabled=1
+[E:\vdf14.1\Crystal2XML\DdSrc]
+IsEnabled=1
+[E:\vdf14.1\Crystal2XML\AppHtml]
+IsEnabled=1
+[C:\Program Files (x86)\Visual DataFlex 14.1\pkg]
+IsEnabled=1

@@ -1,0 +1,1126 @@
+// This code is part of VDF GUIdance
+// Visit us @ http://www.vdf-guidance.com
+// e-Mail us @ info@vdf-guidance.com
+// VDF GUIdance is a mutual project of
+// Frank Vandervelpen - Vandervelpen Systems and
+// Wil van Antwerpen  - Antwise Solutions
+// All software source code should be used <<AS IS>> without any warranty.
+//
+//
+// *** Windows 32 bit file handling wrapper class ***
+//
+
+// 05-09-2000 **WvA: Changed namingconvention of all classes and methods to new standard
+//                   This may be painfull for some of you, but it was really needed as it was
+//                   getting messy. The "vs" -prefix we used before was confusing and could
+//                   unintentionally have been interpreted as "Vdf-GUIdance String".
+//
+// The used naming-convention is:
+//     - a prefix of "vWin32_" for every external function declaration
+//     - a prefix of the letter "v" for the full API name for the vdf-wrapper function.
+//
+// By using this we are guarding ourselves for conflicts with variable declarations
+// of DataAccess in the future.
+//
+//                   vSHGetFolderPath added to retrieve the new shell folders
+//                   vGetWindowsDirectory
+//
+//                   vGetTempFileName
+//                   vGetTempPath
+// 11-17-2001 **WvA: Removed User Interface Error popups such as Error handling.
+//                   This is an absolute need for WebApp. We expect you to handle the
+//                   error in your application anyways. Changed this for:
+//                   vDeleteFile, vCopyFile, vMoveFile and vRenameFile
+// 03-02-2002 **WvA: vRemoveDirectory added
+// 03-11-2002 **WvA: The parameter lpdword in the external function declaration for
+//                   vWin32_SHBrowsForFolder can cause compiler errors.
+//                   It is renamed too avoid this.
+// 11-11-2002 **WvA: Codecleanup, vcSelectFile_Dialog is now cvSelectFile_Dialog, its
+//                   function vSelectedFileName is now just SelectedFileName
+//                   Removed the local keyword in the variable declarations
+
+
+Use Case.mac
+Use File_Dlg.pkg      // Contains OpenDialog class definition
+Use Seq_chnl.pkg
+
+Use windows
+Use Dferror
+Use Dll
+
+Define vMax_Path     for |CI260
+Define vMinChar      for |CI$80
+Define vMaxChar      for |CI$7F
+Define vMinShort     for |CI$8000
+Define vMaxShort     for |CI$7FFF
+Define vMinLong      for |CI$80000000
+Define vMaxLong      for |CI$7FFFFFFF
+Define vMaxByte      for |CI$FF
+Define vMaxWord      for |CI$FFFF
+Define vMaxDword     for |CI$FFFFFFFF
+
+
+
+// For FindFirstFile
+Define vINVALID_HANDLE_VALUE   for |CI-1
+Define vINVALID_FILE_SIZE      for |CI$FFFFFFFF
+Define vERROR_NO_MORE_FILES    for |CI18
+
+// The defines below can be used to find out what kind of error has occured if
+// the API-call ShellExecute is used.
+Define vERROR_FILE_NOT_FOUND   for |CI0002
+Define vERROR_PATH_NOT_FOUND   for |CI0003
+Define vERROR_BAD_FORMAT       for |CI0011
+Define vSE_ERR_ACCESSDENIED    for |CI0005
+Define vSE_ERR_ASSOCINCOMPLETE for |CI0027
+Define vSE_ERR_DDEBUSY         for |CI0030
+Define vSE_ERR_DDEFAIL         for |CI0029
+Define vSE_ERR_DDETIMEOUT      for |CI0028
+Define vSE_ERR_DLLNOTFOUND     for |CI0032
+Define vSE_ERR_FNF             for |CI0002
+Define vSE_ERR_NOASSOC         for |CI0031
+Define vSE_ERR_OOM             for |CI0008
+Define vSE_ERR_PNF             for |CI0003
+Define vSE_ERR_SHARE           for |CI0026
+
+
+
+
+// *WvA: 13-01-1999 Created
+// The Class cSelectFile_Dialog is created to support the function Select_File
+// This function opens the Windows standard file open dialog and returns the selected
+// file_name.
+Class cvSelectFile_Dialog is an OpenDialog
+
+  Procedure Construct_Object Integer iImage_Id
+    Forward Send Construct_Object iImage_Id
+    Set HideReadOnly_State to True
+  End_Procedure // Construct_Object
+
+  Function SelectedFileName Returns String
+    String sFile_Name
+    If (Show_Dialog(current_object)) Begin
+      Move (File_Name(Self)) to sFile_Name
+      Function_Return (Trim(sFile_Name))
+    End
+    Function_Return ''
+  End_Function // SelectedFileName
+End_Class // cvSelectFile_Dialog
+
+// *WvA: 13-01-1999 Created
+// This function opens the Windows standard file open dialog and returns the selected
+// file_name. Returns '' if the user didn't make a selection.
+Function vSelect_File Global String sSupportedFileTypes String sCaptionText ;
+  String sInitial_Folder Returns String
+  String sSelected_File
+  Object oSelectFile_Dialog is a cvSelectFile_Dialog
+    Set Dialog_Caption  to sCaptionText
+    Set Filter_String   to sSupportedFileTypes
+    Set Initial_Folder  to sInitial_Folder
+  End_Object // oSelectFile_Dialog
+  Function_Return (SelectedFileName(oSelectFile_Dialog(Self)))
+End_Function // vSelect_File
+
+// These functions will only work if you include the packages of vdfquery
+//
+//// Pre:  sFileName contains the complete path of the file.
+//// Post: returns the complete path of the file.
+//// This function is inspired on function SEQ_ExtractPathFromFileName of Sture Andersen.
+//Function ParseFolderName Global String sFileName Returns String
+//  String sFolderName
+//  String sDirSeperator // this is "\" for windows, or "/" for unix
+//  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSeperator
+//  If sDirSeperator in sFileName function_return (StripFromLastOccurance(sFileName,sDirSeperator))
+//  if ":" in sFileName function_return (StripFromLastOccurance(sFileName,":"))
+//  Function_Return sFolderName
+//End_Function // ParseFolderName
+
+
+//// Pre:  sFileName contains the complete path of the file.
+//// post: The returned filename will have a extension
+//Function ParseFileName Global String sFileName Returns String
+//  String sFolderName
+//  String sDirSeperator // this is "\" for windows, or "/" for unix
+//  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSeperator
+//  Get ParseFolderName sFileName To sFolderName
+//  If (sFolderName NE "") replace sFolderName in sFileName with ""
+//  replace sDirSeperator in sFileName with ""
+//  Function_Return sFilename
+//End_Function // ParseFileName
+
+
+//// Pre:  sFileName may contain the complete path of the file.
+//// Post: returns the extension only, this extension can be a valid unixlike extension
+////       such as "html" or "java"
+//Function ParseFileExtension Global String sFileName Returns String
+//  String sFileExtension
+//  If "." in sFileName Begin
+//    Move sFileName To sFileExtension
+//    Move (StripFromLastOccurance(sFileName,".")) To sFileName
+//    If (sFileName NE "") replace sFileName in sFileExtension with ""
+//    Else Move "" To sFileExtension
+//    If (sFileName NE "") replace "." in sFileExtension with ""
+//    End
+//  Function_Return sFileExtension
+//End_Function // ParseFileExtension
+
+Function DDE_Error_To_String Integer iErrorID Returns String
+  String sMessage
+  Case Begin
+    Case (iErrorID = vERROR_FILE_NOT_FOUND)
+      Append sMessage "The specified file was not found.\n"
+      Case Break
+    Case (iErrorID = vERROR_PATH_NOT_FOUND)
+      Append sMessage "The specified path was not found.\n"
+      Case Break
+    Case (iErrorID = vERROR_BAD_FORMAT)
+      Append sMessage "The .EXE file is invalid.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_ACCESSDENIED)
+      Append sMessage "The operating system denied access to the specified file.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_ASSOCINCOMPLETE)
+      Append sMessage "The filename association is incomplete or invalid.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_DDEBUSY)
+      Append sMessage "The DDE transaction could not be completed because other DDE\n"
+      Append sMessage "transactions were being processed.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_DDEFAIL)
+      Append sMessage "The DDE transaction failed.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_DDETIMEOUT)
+      Append sMessage "The DDE transaction could not be completed,\n"
+      Append sMessage "because the request timed out.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_DLLNOTFOUND)
+      Append sMessage "The specified dynamic-link library was not found.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_NOASSOC)
+      Append sMessage "There is no application associated with the given filename extension.\n"
+      Case Break
+    Case ((iErrorID = vSE_ERR_OOM) or (iErrorID = 0))
+      Append sMessage "There is not enough free memory available to complete the operation.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_PNF)
+      Append sMessage "The specified path was not found.\n"
+      Case Break
+    Case (iErrorID = vSE_ERR_SHARE)
+      Append sMessage "A sharing violation occurred.\n"
+      Case Break
+    Case Else
+      Append sMessage "Unknown DDE-error occurred.\n"
+      Append sMessage ("Errornumber"*trim(iErrorID)*".\n")
+      Case Break
+  Case End
+  Function_Return sMessage
+End_Function // DDE_Error_To_String
+
+
+Procedure vDDE_Error_Handler Integer iErrorID
+  String sMessage
+  Get DDE_Error_To_String to sMessage
+  Append sMessage "\nPress a key to continue...\n\n"
+  Send Stop_Box sMessage "a DDE-error occured"
+End_Procedure // vDDE_Error_Handler hInstance
+
+
+// Does the directory exist? - No = 0, Yes = 1
+// This also works with UNC path encoding and wildcards
+Function vFolderExists Global String sFolderName Returns Integer
+  String  sFolder sTmp
+  Integer bFolderExists iCh
+
+  Move dfTrue to bFolderExists
+  Move "dir:" to sFolder
+  Append sFolder sFolderName
+  Get Seq_New_Channel to iCh  // get free channel for input
+  Direct_Input channel iCh sFolder
+    Repeat
+      Readln channel iCh sTmp
+      If (trim(sTmp)="") Move dfFalse to bFolderExists
+      Else Begin
+        Move dfTrue to bFolderExists
+        indicate SeqEof True  // end loop
+        End
+    Until (SeqEof)
+  Close_Input channel iCh
+  Send Seq_Release_Channel iCh
+  Function_Return bFolderExists
+End_Function  // vFolderExists
+
+
+
+// C-Structure
+//typedef struct _browseinfo {
+//    HWND hwndOwner;
+//    LPCITEMIDLIST pidlRoot;
+//    LPSTR pszDisplayName;
+//    LPCSTR lpszTitle;
+//    UINT ulFlags;
+//    BFFCALLBACK lpfn;
+//    LPARAM lParam;
+//    int iImage;
+//} BROWSEINFO, *PBROWSEINFO, *LPBROWSEINFO;
+
+//declare C structure struct_browseinfo
+//as documented in MSDN under Windows Shell API
+Type vtBrowseInfo
+  Field vtBrowseInfo.hWndOwner      as Handle
+  Field vtBrowseInfo.pIDLRoot       as Pointer
+  Field vtBrowseInfo.pszDisplayName as Pointer
+  Field vtBrowseInfo.lpszTitle      as Pointer
+  Field vtBrowseInfo.ulFlags        as DWord
+  Field vtBrowseInfo.lpfnCallback   as Pointer
+  Field vtBrowseInfo.lParam         as DWord
+  Field vtBrowseInfo.iImage         as DWord
+End_Type // tBrowseInfo
+
+// Browsing for directory.
+Define vBIF_RETURNONLYFSDIRS   for |CI$0001  // For finding a folder to start document searching
+Define vBIF_DONTGOBELOWDOMAIN  for |CI$0002  // For starting the Find Computer
+Define vBIF_STATUSTEXT         for |CI$0004  // Includes a status area in the dialog box.
+                                            // The callback function can set the status text by
+                                            // sending messages to the dialog box.
+Define vBIF_RETURNFSANCESTORS  for |CI$0008  // Only returns file system ancestors.
+
+Define vBIF_BROWSEFORCOMPUTER  for |CI$1000  // Browsing for Computers.
+Define vBIF_BROWSEFORPRINTER   for |CI$2000  // Browsing for Printers
+
+// message from browser
+//Define BFFM_INITIALIZED        1
+//Define BFFM_SELCHANGED         2
+
+// messages to browser
+//Define BFFM_SETSTATUSTEXT      (WM_USER + 100)
+//Define BFFM_ENABLEOK           (WM_USER + 101)
+//Define BFFM_SETSELECTION       (WM_USER + 102)
+
+
+External_Function vWin32_SHBrowseForFolder "SHBrowseForFolder" shell32.dll ;
+  Pointer lpsBrowseInfo Returns DWord
+
+External_Function vWin32_SHGetPathFromIDList "SHGetPathFromIDList" shell32.dll ;
+  Pointer pidList Pointer lpBuffer Returns DWord
+
+External_Function vWin32_CoTaskMemFree "CoTaskMemFree" ole32.dll Pointer pV Returns Integer
+
+// returns folder name if a folder was selected, otherwise returns ""
+Function vSHBrowseForFolder Global String sDialogTitle Returns String
+  String sFolder sBrowseInfo sTitle
+  Pointer lpItemIdList lpsFolder lpsBrowseInfo lpsTitle
+  Integer iFolderSelected iRetval
+
+  // fill string variable with null characters
+  ZeroType vtBrowseInfo to sBrowseInfo
+
+  If (sDialogTitle<>"") Begin
+    Move sDialogTitle to sTitle
+    // Torben Lund suggested converting the string with toansi. Doing it like that
+    // disables showing some commonly used ascii characters like ascii 137 (%)
+    // These chars are correctly shown if no toansi is used.
+    // I can imagine that he wanted to path to be ANSI, but as long as it isa just
+    // selected it will always be valid.
+    GetAddress of sTitle to lpsTitle
+    Put lpsTitle to sBrowseInfo at vtBrowseInfo.lpszTitle
+  End
+
+  Put vBIF_RETURNONLYFSDIRS to sBrowseInfo at vtBrowseInfo.ulFlags
+
+  // Torben Lund added line below. Move handle of focus object to structure before
+  // calling function. Otherwise, the folderdialog will be started as a seperate task.
+  Put (window_handle(focus(desktop))) to sBrowseInfo at vtBrowseInfo.hWndOwner
+
+  GetAddress of sBrowseInfo to lpsBrowseInfo
+
+  // null 128 chars into var (make space)
+  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+  GetAddress of sFolder to lpsFolder
+
+  // select folder
+  Move (vWin32_SHBrowseForFolder(lpsBrowseInfo)) to lpItemIdList
+  // get selected folder name
+  Move (vWin32_SHGetPathFromIDList(lpItemIdList, lpsFolder)) to iFolderSelected
+
+  // release memory resources that are used by the ItemIdList
+  Move (vWin32_CoTaskMemFree(lpItemIdList)) to iRetval
+
+  If (iFolderSelected<>0) Function_Return (CString(sFolder))
+  Else Function_Return ""
+End_Function // vSHBrowseForFolder
+
+
+
+Type vtSecurity_attributes
+  Field vtSecurity_attributes.nLength        as DWord
+  Field vtSecurity_attributes.lpDescriptor   as Pointer
+  Field vtSecurity_attributes.bInheritHandle as Integer
+End_Type // vtSecurity_attributes
+
+//nLength:
+// Specifies the size, in bytes, of this structure. Set this value to the size of the
+// SECURITY_ATTRIBUTES structure.
+// Windows NT: Some functions that use the SECURITY_ATTRIBUTES structure do not verify the
+// value of the nLength member. However, an application should still set it properly.
+// That ensures current, future, and cross-platform compatibility.
+//
+//lpSecurityDescriptor:
+// Points to a security descriptor for the object that controls the sharing of it.
+// If NULL is specified for this member, the object may be assigned the default security
+// descriptor of the calling process.
+//
+//bInheritHandle:
+// Specifies whether the returned handle is inherited when a new process is created.
+// If this member is TRUE, the new process inherits the handle.
+
+
+// BOOL CreateDirectory(
+//    LPCTSTR lpPathName,
+//    LPSECURITY_ATTRIBUTES lpSecurityAttributes  // pointer to a security descriptor
+//   );
+//
+// lpPathName
+//  Points to a null-terminated string that specifies the path of the directory
+//  to be created.
+//  There is a default string size limit for paths of MAX_PATH characters.
+//  This limit is related to how the CreateDirectory function parses paths.
+// lpSecurityAttributes
+//  Pointer to a SECURITY_ATTRIBUTES structure als called a security descriptor that
+//  determines whether the returned handle can be inherited by child processes.
+//  If lpSecurityAttributes is NULL, the handle cannot be inherited.
+// Returns:
+//  If the function succeeds, the return value is nonzero.
+//  If the function fails, the return value is zero. To get extended error information, call GetLastError.
+External_Function vWin32_CreateDirectory "CreateDirectoryA" kernel32.dll ;
+  Pointer lpPathName Pointer lpSecurity_Attributes Returns Integer
+
+
+// lpPathName
+//  Points to a null-terminated string that specifies the path of the directory
+//  to be removed.
+//  There is a default string size limit for paths of MAX_PATH characters.
+// Returns:
+//  If the function succeeds, the return value is nonzero.
+//  If the function fails, the return value is zero. To get extended error information, call GetLastError.
+External_Function vWin32_RemoveDirectory "RemoveDirectoryA" kernel32.dll ;
+  Pointer lpPathName Returns Integer
+
+
+// returns 0 if the folder is created.
+//         1 if the API-call returned an error.
+Function vCreateDirectory Global String sNewFolder Returns Integer
+  String  sFolder sSA
+  Pointer lpsFolder lpsSecurity_Attributes lpDescriptor
+  Integer iRetval bFolderCreated bInheritHandle
+
+  Move (False) to bFolderCreated
+  // fill string variable with null characters
+  ZeroType vtSecurity_attributes to sSA
+
+  // null MAX_PATH chars into var (make space)
+  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+
+  If (sNewFolder <> "") Begin
+
+    Move dfTrue to  bInheritHandle
+    // Setting this to NULL is already done by the zerotype command
+    // Move NULL   To  lpDescriptor
+    Put (length(sSA))   to sSA at vtSecurity_attributes.nLength
+    //Put lpDescriptor To sSA at vtSecurity_attributes.lpDescriptor
+    Put bInheritHandle to sSA at vtSecurity_attributes.bInheritHandle
+
+    GetAddress of sSA to lpsSecurity_Attributes
+
+    //
+    Move sNewFolder to sFolder
+    GetAddress of sFolder to lpsFolder
+    Move (vWin32_CreateDirectory(lpsFolder, lpsSecurity_Attributes)) to bFolderCreated
+  End
+
+  IfNot bFolderCreated Move 1 to iRetVal
+  Function_Return iRetVal
+End_Function // vCreateDirectory
+
+
+// **WvA: 03-02-2002 Function created.
+// With this function one can remove a directory.
+// returns 0 if the folder is removed.
+//         1 if the API-call returned an error (Use GetLastError API to get the details)
+//         2 if the folder did not exist
+//         3 if the sFolder parameter passed is equal to ""
+Function vRemoveDirectory Global String sFolder Returns Integer
+  String  sPath
+  Pointer lpsPath
+  Integer iRetval bRemoved bExists
+
+  Move (False) to bRemoved
+  Move 0 to iRetVal
+  Move (Trim(sFolder)) to sFolder
+  If (sFolder="") Begin
+    Move 3 to iRetVal
+  End
+  If (vFolderExists(sFolder)=False) Begin
+    Move 2 to iRetVal
+  End
+  If (iRetVal=0) Begin
+    // null MAX_PATH chars into var (make space)
+    Move (Repeat(character(0), vMAX_PATH)) to sPath
+    //
+    Move (Insert(sFolder,sPath,1)) to sPath
+    GetAddress of sPath to lpsPath
+    Move (vWin32_RemoveDirectory(lpsPath)) to bRemoved
+  End
+
+  If ((iRetVal=0) and (bRemoved=False)) Begin
+    Move 1 to iRetVal
+  End
+  Function_Return iRetVal
+End_Function // vRemoveDirectory
+
+
+
+// This function informs the user that he entered a yet unknown folder and
+// asks if he/she wants to create the folder (Yes/No)
+// Choice: "Yes" - this creates the folder
+//                 if successful, the function returns false
+//                 else it will be true.
+// Choice: "No"  - returns TRUE, This allows the programmer to take action
+//                 For example: to stop a save
+// Precondition: A foldername must be entered. We do not check for empty paths
+// This function returns a non-zero value if the folder isn't created afterwards
+Function vVerifyNewFolder Global String sFolderName Returns Integer
+  Integer bIsNotValid
+  Integer iUsers_Choice
+  String  sMessage
+
+  If (vFolderExists(sFolderName) EQ 0) Begin
+    Move "The folder '" to sMessage
+    Append sMessage sFolderName
+    Append sMessage "' does not yet exist,\n"
+    Append sMessage "Do you want to create it now?"
+    Get YesNo_Box sMessage "Confirm" MB_DefButton1 to iUsers_Choice
+    Case Begin
+      Case (iUsers_Choice = MBR_Yes)
+        Move (vCreateDirectory(sFolderName)) to bIsNotValid
+        If bIsNotValid Begin
+          Move "An error occurred while trying to create folder '" to sMessage
+          Append sMessage sFolderName "'.\n\n"
+          Send Info_Box sMessage "Info"
+          End
+        Case Break
+      Case (iUsers_Choice = MBR_No)
+        Move dfTrue to bIsNotValid // Cancel the save
+        Case Break
+    Case End
+  End
+  Function_Return bIsNotValid
+End_Function // vVerifyNewFolder
+
+
+// The ShellExecute function opens or prints a specified file. The file can be an
+// executable file or a document file.
+//
+// Operation can be one of the following:
+//    "OPEN"  The function opens the file specified by lpFile.
+//            The file can be an executable file or a document file.
+//            The file can be a folder to open.
+//    "PRINT" The function prints the file specified by lpFile.
+//            The file should be a document file. If the file is an executable file,
+//            the function opens the file, as if "open" had been specified.
+//  "EXPLORE" The function explores the folder specified by lpFile.
+//
+// Return Values:
+//
+// If the function succeeds, the return value is the instance handle of the application that
+// was run, or the handle of a dynamic data exchange (DDE) server application.
+// If the function fails, the return value is an error value that is less than or equal to 32.
+//
+// The following table lists these error values:
+// Public Const ERROR_FILE_NOT_FOUND = 2&
+// Public Const ERROR_PATH_NOT_FOUND = 3&
+// Public Const ERROR_BAD_FORMAT = 11&
+// Public Const SE_ERR_ACCESSDENIED = 5
+// Public Const SE_ERR_ASSOCINCOMPLETE = 27
+// Public Const SE_ERR_DDEBUSY = 30
+// Public Const SE_ERR_DDEFAIL = 29
+// Public Const SE_ERR_DDETIMEOUT = 28
+// Public Const SE_ERR_DLLNOTFOUND = 32
+// Public Const SE_ERR_FNF = 2
+// Public Const SE_ERR_NOASSOC = 31
+// Public Const SE_ERR_OOM = 8
+// Public Const SE_ERR_PNF = 3
+// Public Const SE_ERR_SHARE = 26
+
+
+
+// Code to open the program that is associated with the selected file.
+//
+// External function call used in Procedure DoStartDocument
+External_Function vWin32_ShellExecute "ShellExecuteA" shell32.dll ;
+  Handle hWnd ;
+  Pointer lpOperation ;
+  Pointer lpFile ;
+  Pointer lpParameters ;
+  Pointer lpDirectory ;
+  DWord iShowCmd Returns Handle
+
+
+// This will perform an operation on a file (e.g. open) with the application
+// registered in the Windows Registry to open that type of file (via its extension)
+// sOperation would be "OPEN" (it could also be "PRINT" etc).
+Procedure vShellExecute Global String sOperation String sDocument String sParameters String sPath
+    Send vShellExecuteBase sOperation sDocument sParameters sPath 1
+End_Procedure
+
+Procedure vShellExecuteHide Global String sOperation String sDocument String sParameters String sPath
+    Send vShellExecuteBase sOperation sDocument sParameters sPath 0
+End_Procedure
+
+
+Procedure vShellExecuteBase Global String sOperation String sDocument String sParameters String sPath Integer iHide
+  Handle  hInstance hWnd
+  Pointer lpsOperation
+  Pointer lpsDocument
+  Pointer lpsParameters
+  Pointer lpsPath
+  // remove any leading/trailing spaces in the string
+  Move (Trim(sDocument)) to sDocument
+  Move (Trim(sPath))     to sPath
+  // Make the strings readable for windows API, by converting them to null-terminated
+  Append sOperation   (Character(0))
+  Append sDocument    (Character(0))
+  Append sParameters  (Character(0))
+  Append sPath        (Character(0))
+  // Connect the corresponding pointers to the strings
+  GetAddress of sOperation  to lpsOperation
+  GetAddress of sDocument   to lpsDocument
+  GetAddress of sParameters to lpsParameters
+  GetAddress of sPath       to lpsPath
+
+  Get Window_Handle to hWnd
+  Move (vWin32_ShellExecute (hWnd, lpsOperation, lpsDocument, lpsParameters, lpsPath, iHide)) to hInstance
+  If (hInstance <= 32) Begin
+    Send vDDE_Error_Handler hInstance
+  End
+End_Procedure // vShellExecute
+
+
+#IFDEF vFO_MOVE
+#ELSE
+
+#Replace vFO_MOVE           |CI$0001
+#Replace vFO_COPY           |CI$0002
+#Replace vFO_DELETE         |CI$0003
+#Replace vFO_RENAME         |CI$0004
+
+#Replace vFOF_MULTIDESTFILES     |CI$0001
+#Replace vFOF_CONFIRMMOUSE       |CI$0002
+#Replace vFOF_SILENT             |CI$0004  // don't create progress/report
+#Replace vFOF_RENAMEONCOLLISION  |CI$0008
+#Replace vFOF_NOCONFIRMATION     |CI$0010  // Don't prompt the user.
+#Replace vFOF_WANTMAPPINGHANDLE  |CI$0020  // Fill in SHFILEOPSTRUCT.hNameMappings
+                                          // Must be freed using SHFreeNameMappings
+#Replace vFOF_ALLOWUNDO          |CI$0040
+#Replace vFOF_FILESONLY          |CI$0080  // on *.*, do only files
+#Replace vFOF_SIMPLEPROGRESS     |CI$0100  // means don't show names of files
+#Replace vFOF_NOCONFIRMMKDIR     |CI$0200  // don't confirm making any needed dirs
+
+Type vtShFileOpStruct
+  Field vtShFileOpStruct.hWnd                   as Handle
+  Field vtShFileOpStruct.wFunc                  as Integer
+  Field vtShFileOpStruct.pFrom                  as Pointer
+  Field vtShFileOpStruct.pTo                    as Pointer
+  Field vtShFileOpStruct.fFlags                 as Short
+  Field vtShFileOpStruct.fAnyOperationsAborted  as Short
+  Field vtShFileOpStruct.hNameMappings          as Pointer
+  Field vtShFileOpStruct.lpszProgressTitle      as Pointer // only used if FOF_SIMPLEPROGRESS
+End_Type // tShFileOpStruct
+
+// hwnd
+//   Handle of the dialog box to use to display information about the status of the operation.
+
+// wFunc
+//   Operation to perform. This member can be one of the following values:
+//     FO_COPY     Copies the files specified by pFrom to the location specified by pTo.
+//     FO_DELETE   Deletes the files specified by pFrom (pTo is ignored).
+//     FO_MOVE     Moves the files specified by pFrom to the location specified by pTo.
+//     FO_RENAME   Renames the files specified by pFrom.
+
+// pFrom
+//   Pointer to a buffer that specifies one or more source file names. Multiple names must
+//   be null-separated. The list of names must be double null-terminated.
+
+// pTo
+//   Pointer to a buffer that contains the name of the destination file or directory. The
+//   buffer can contain mutiple destination file names if the fFlags member specifies
+//   FOF_MULTIDESTFILES. Multiple names must be null-separated. The list of names must be
+//   double null-terminated.
+
+// fAnyOperationsAborted
+//   Value that receives TRUE if the user aborted any file operations before they
+//   were completed or FALSE otherwise.
+
+#ENDIF
+
+// Performs a copy, move, rename, or delete operation on a file system object.
+// This can be a file or a folder.
+// With thanks to Andrew S Kaplan
+External_Function vWin32_SHFileOperation "SHFileOperationA" Shell32.dll ;
+        Pointer lpFileOp Returns Integer
+
+
+
+Function vDeleteFile Global String sFileName Returns Integer
+  String   sShFileOp
+  Pointer  lpShFileOp
+  Pointer  lpsFileName
+  Integer  iFlags
+  Integer  iRetVal
+  Integer  bUserAbort
+
+  ZeroType vtShFileOpStruct to sShFileOp
+  Append sFileName (Character(0)) (Character(0))
+  GetAddress of sFileName to lpsFileName
+  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+
+  Put vFO_DELETE   to sShFileOp at vtShFileOpStruct.wFunc
+  Put lpsFileName to sShFileOp at vtShFileOpStruct.pFrom
+  Put iFlags      to sShFileOp at vtShFileOpStruct.fFlags
+  GetAddress of sShFileOp to lpShFileOp
+
+  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+  If (bUserAbort <> 0) Begin
+    Move 80 to iRetVal //   Deletefile Operation Aborted by USER
+  End
+  Function_Return iRetVal
+End_Function // vDeleteFile
+
+
+Function vCopyFile Global String sSource String sDestination Returns Integer
+  String   sShFileOp
+  Pointer  lpShFileOp
+  Pointer  lpsSource
+  Pointer  lpsDestination
+  Integer  iFlags
+  Integer  iRetVal
+  Integer  bUserAbort
+
+  ZeroType vtShFileOpStruct to sShFileOp
+  Append sSource      (Character(0)) (Character(0))
+  Append sDestination (Character(0)) (Character(0))
+  GetAddress of sSource      to lpsSource
+  GetAddress of sDestination to lpsDestination
+  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+
+  Put vFO_COPY        to sShFileOp at vtShFileOpStruct.wFunc
+  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+
+  GetAddress of sShFileOp to lpShFileOp
+
+  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+  If (bUserAbort <> 0) Begin
+    Move 80 to iRetVal  // Copyfile Operation Aborted by USER
+  End
+  Function_Return (iRetVal)
+End_Function // vCopyFile
+
+
+Function vMoveFile Global String sSource String sDestination Returns Integer
+  String   sShFileOp
+  Pointer  lpShFileOp
+  Pointer  lpsSource
+  Pointer  lpsDestination
+  Integer  iFlags
+  Integer  iRetVal
+  Integer  bUserAbort
+
+  ZeroType vtShFileOpStruct to sShFileOp
+  Append sSource      (Character(0)) (Character(0))
+  Append sDestination (Character(0)) (Character(0))
+  GetAddress of sSource      to lpsSource
+  GetAddress of sDestination to lpsDestination
+  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+
+  Put vFO_MOVE        to sShFileOp at vtShFileOpStruct.wFunc
+  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+
+  GetAddress of sShFileOp to lpShFileOp
+
+  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+  If (bUserAbort <> 0) Begin
+    Move 80 to iRetVal // Movefile Operation Aborted by USER
+  End
+  Function_Return (iRetVal)
+End_Function // vMoveFile
+
+// Rename a file or folder
+// Returns a nonzero value if the operation failed.
+Function vRenameFile Global String sSource String sDestination Returns Integer
+  String   sShFileOp
+  Pointer  lpShFileOp
+  Pointer  lpsSource
+  Pointer  lpsDestination
+  Integer  iFlags
+  Integer  iRetVal
+  Integer  bUserAbort
+
+  ZeroType vtShFileOpStruct to sShFileOp
+  Append sSource      (Character(0)) (Character(0))
+  Append sDestination (Character(0)) (Character(0))
+  GetAddress of sSource      to lpsSource
+  GetAddress of sDestination to lpsDestination
+  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+
+  Put vFO_RENAME      to sShFileOp at vtShFileOpStruct.wFunc
+  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+
+  GetAddress of sShFileOp to lpShFileOp
+
+  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+  If (bUserAbort <> 0) Begin
+    Move 80 to iRetVal // Renamefile Operation Aborted by USER
+  End
+  Function_Return (iRetVal)
+End_Function // vRenameFile
+
+
+// Thanks To Oliver Nelson for posting this code on the newsgroups
+External_Function vWin32_GetWindowsDirectory "GetWindowsDirectoryA" kernel32.dll ;
+                           Pointer lpBuffer Integer nSize Returns Integer
+
+
+Function vGetWindowsDirectory Returns String
+  String  sDirectory
+  Pointer lpDirectory
+  Integer iVoid
+
+  ZeroString vMAX_PATH to sDirectory
+  GetAddress of sDirectory to lpDirectory
+
+  Move (vWin32_GetWindowsDirectory(lpDirectory, vMAX_PATH)) to iVoid
+  Function_Return (CString(sDirectory))  // **WvA: Changed to CString()
+End_Function // vGetWindowsDirectory
+
+
+
+// Courtesy Of Vincent Oorsprong
+//External_Function vWin32_GetTempFileName "GetTempFileNameA" Kernel32.Dll ;
+//   Pointer lpPathName ;
+//   Pointer lpPrefixString ;
+//   Integer uUnique ;
+//   Pointer lpTempFileName ;
+//   Returns Integer
+
+External_Function vWin32_GetTempFileName "GetTempFileNameA" kernel32.dll String sPath ;
+        String sPrefix Integer iUnique Pointer pLoad Returns Integer
+
+External_Function vWin32_GetTempPath "GetTempPathA" Kernel32.Dll ;
+   DWord nBufferLength ;
+   Pointer lpBuffer ;
+   Returns Integer
+
+External_Function vWin32_DeleteFile "DeleteFileA" Kernel32.Dll ;
+   Pointer lpFileName ;
+   Returns Integer
+
+// Courtesy of Marco Kuipers
+Function vMakeTempFile Returns String
+    Integer iRetval
+    String  sTempPath sTempFileName sPrefixString
+    Pointer lpTempPath lpTempFileName lpPrefixString
+
+    Move (Repeat (Character (0), 255)) to sTempPath
+    GetAddress of sTempPath to lpTempPath
+    Move (vWin32_GetTempPath (255, lpTempPath)) to iRetVal
+
+    If (sTempPath = "") Begin
+       Get_Current_Directory to sTempPath
+    End
+
+    Move (Repeat (Character (0), 255)) to sTempFileName
+    GetAddress of sTempFileName to lpTempFileName
+    Move "tmp" to sPrefixString // TMP
+    GetAddress of sPrefixString to lpPrefixString
+    GetAddress of sTempPath to lpTempPath
+    Move (vWin32_GetTempFileName (lpTempPath, lpPrefixString, 0, lpTempFileName)) to iRetval
+    If (iRetval <> 0) Begin
+        Move "" to sTempFileName
+    End
+
+    Function_Return sTempFileName
+End_Function // vMakeTempFile
+
+
+Function vCreateTempFileInPath String Path String Prefix Returns String
+    String TempFileName
+    Integer iCnt iRetVal
+    Pointer lpTempFileName
+
+    Move (pad("", vMAX_PATH)) to TempFileName
+    GetAddress of TempFileName to lpTempFileName
+
+    Move (vWin32_GetTempFileName(Path, Prefix, 0, lpTempFileName)) to iRetVal
+    Move (trim(TempFileName)) to TempFileName
+    left TempFileName to TempFileName (Length(TempFileName)-1)
+    Function_Return TempFileName
+End_Function
+
+
+Define vCSIDL_DESKTOP          for |CI$00
+Define vCSIDL_PROGRAMS         for |CI$02
+Define vCSIDL_CONTROLS         for |CI$03
+Define vCSIDL_PRINTERS         for |CI$04
+Define vCSIDL_PERSONAL         for |CI$05   // (Documents folder)
+Define vCSIDL_FAVORITES        for |CI$06
+Define vCSIDL_STARTUP          for |CI$07
+Define vCSIDL_RECENT           for |CI$08   // (Recent folder)
+Define vCSIDL_SENDTO           for |CI$09
+Define vCSIDL_BITBUCKET        for |CI$0A
+Define vCSIDL_STARTMENU        for |CI$0B
+Define vCSIDL_DESKTOPDIRECTORY for |CI$10
+Define vCSIDL_DRIVES           for |CI$11
+Define vCSIDL_NETWORK          for |CI$12
+Define vCSIDL_NETHOOD          for |CI$13
+Define vCSIDL_FONTS            for |CI$14
+Define vCSIDL_TEMPLATES        for |CI$15   // (ShellNew folder)
+
+
+//HRESULT SHGetFolderPath(
+//    HWND hwndOwner,
+//    int nFolder,
+//    HANDLE hToken,
+//    DWORD dwFlags,
+//    LPTSTR pszPath
+//);
+// This function is a superset of SHGetSpecialFolderPath, included with earlier versions of
+// the shell. It is implemented in a redistributable DLL, SHFolder.dll, that also simulates
+// many of the new shell folders on older platforms such as Windows 95, Windows 98, and
+// Windows NT 4.0. This DLL always calls the current platform's version of this function.
+// If that fails, it will try to simulate the appropriate behavior.
+//
+External_Function vWin32_SHGetFolderPath "SHGetFolderPathA" SHFolder.Dll ;
+   Pointer hWnd ;
+   Integer nFolder ;
+   Pointer hToken ;
+   DWord   dwFlags ;
+   Pointer lpszPath ;
+   Returns Integer
+
+Function vSHGetFolderPath Integer nFolder Returns String
+  String  sFolder
+  Integer iVoid
+  Pointer lpsFolder
+  Handle  hWnd
+  Move (Window_Handle(focus(desktop))) to hWnd
+
+  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+  GetAddress of sFolder to lpsFolder
+
+  Move (vWin32_SHGetFolderPath(hWnd,nFolder, 0, 0,lpsFolder)) to iVoid
+  Function_Return (CString(sFolder))
+End_Function // vSHGetFolderPAth
+
+
+
+
+Type vWin32_Find_Data
+  Field vWin32_Find_Data.dwFileAttributes as DWord
+  Field vWin32_Find_Data.ftCreationLowDateTime as DWord
+  Field vWin32_Find_Data.ftCreationHighDateTime as DWord
+  Field vWin32_Find_Data.ftLastAccessLowDateTime as DWord
+  Field vWin32_Find_Data.ftLastAccessHighDateTime as DWord
+  Field vWin32_Find_Data.ftLastWriteLowDateTime as DWord
+  Field vWin32_Find_Data.ftLastWriteHighDateTime as DWord
+  Field vWin32_Find_Data.nFileSizeHigh as DWord
+  Field vWin32_Find_Data.nFileSizeLow as DWord
+  Field vWin32_Find_Data.dwReserved0 as DWord
+  Field vWin32_Find_Data.dwReserved1 as DWord
+  Field vWin32_Find_Data.cFileName as Char vMax_Path
+  Field vWin32_Find_Data.cAlternateFileName as Char 14
+End_Type // vWin32_Find_Data
+
+// Courtesy Of Vincent Oorsprong
+// lpFileName      : address of name of file to search for
+// lpFindFileData  : address of returned information
+External_Function vWin32_FindFirstFile "FindFirstFileA"  Kernel32.dll Pointer lpFileName ;
+          Pointer lpFindFileData Returns Handle
+
+// Courtesy Of Vincent Oorsprong
+// hFindFile       : handle of search
+// lpFindFileData  : address of structure for data on found file
+External_Function vWin32_FindNextFile "FindNextFileA" Kernel32.dll Handle hFindFile ;
+          Pointer lpFindFileData Returns Integer
+
+// Courtesy Of Vincent Oorsprong
+//  hFindFile      : file search handle
+External_Function vWin32_FindClose "FindClose" Kernel32.dll Handle hFindFile Returns Integer
+
+
+
+Type vFileTime
+  Field vFileTime.dwLowDateTime as DWord
+  Field vFileTime.dwHighDateTime as DWord
+End_Type // vFileTime
+
+
+Type vSystemTime
+  Field vSystemTime.wYear as Word
+  Field vSystemTime.wMonth as Word
+  Field vSystemTime.wDayOfWeek as Word
+  Field vSystemTime.wDay as Word
+  Field vSystemTime.wHour as Word
+  Field vSystemTime.wMinute as Word
+  Field vSystemTime.wSecond as Word
+  Field vSystemTime.wMilliSeconds as Word
+End_Type // vSystemTime
+
+
+// Courtesy Of Vincent Oorsprong
+//  lpFileTime     : pointer to file time to convert
+//  lpSystemTime   : pointer to structure to receive system time
+External_Function vWin32_FileTimeToSystemTime "FileTimeToSystemTime" Kernel32.Dll ;
+          Pointer lpFileTime Pointer lpsystemTime Returns Integer
+
+// Courtesy Of Vincent Oorsprong
+// This function formats the time in a picture-string passed
+//
+// Picture      Meaning
+//    h         Hours with no leading zero for single-digit hours; 12-hour clock
+//    hh        Hours with leading zero for single-digit hours; 12-hour clock
+//    H         Hours with no leading zero for single-digit hours; 24-hour clock
+//    HH        Hours with leading zero for single-digit hours; 24-hour clock
+//    m         Minutes with no leading zero for single-digit minutes
+//    mm        Minutes with leading zero for single-digit minutes
+//    s         Seconds with no leading zero for single-digit seconds
+//    ss        Seconds with leading zero for single-digit seconds
+//    t         One character time marker string, such as A or P
+//    tt        Multicharacter time marker string, such as AM or PM
+//
+// For example, to get the time string  "11:29:40 PM"
+//    use the following picture string: "hh" : "mm" : "ss tt"
+
+External_Function vWin32_GetTimeFormat "GetTimeFormatA" Kernel32.Dll ;
+  DWord LCID DWord dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpTimeStr ;
+  Integer cchTime Returns Integer
+
+
+// Courtesy Of Vincent Oorsprong
+// This function formats the date in a picture-string passed
+//
+// Picture      Meaning
+//    d         Day of month as digits with no leading zero for single-digit days.
+//    dd        Day of month as digits with leading zero for single-digit days.
+//    ddd       Day of week as a three-letter abbreviation. The function uses the
+//              LOCALE_SABBREVOAYMAME value associated with the specified locale.
+//    dddd      Day of week as its full name. The function uses the LOCALE_SDAYNAME
+//              value associated with the specified locale.
+//    M         Month as digits with no leading zero for single-digit months.
+//    MM        Month as digits with leading zero for single-digit months.
+//    MMM       Month as a three-letter abbreviation. The function uses the
+//              LOCALE_SABBREVMONTHNAME value associated with the specified locale.
+//    MMMM      Month as its full name. The function uses the LOCALE_SMONTHNAME value
+//              associated with the specified locale.
+//    y         Year as last two digits, but with no leading zero for years less than 10.
+//    yy        Year as last two digits, but with leading zero for years less than 10.
+//    yyyy      Year represented hy full four digits.
+//    gg        Period/era string. The function uses the CAL_SERASTRING value associated
+//              with the specified locale. This element is ignored if the date to be formatted
+//              does not have an associated era or period string.
+// For example, to get the date string  "Wed, Aug 31 94"
+// use the following picture string:    "ddd","MMM dd yy"
+
+External_Function vWin32_GetDateFormat "GetDateFormatA" Kernel32.Dll ;
+  DWord LCID DWord dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpDateStr ;
+  Integer cchDate Returns Integer
+
+Define LOCALE_NOUSEROVERRIDE    for |CI$80000000  //  do not use user overrides
+Define TIME_NOMIHUTESORSECONDS  for |CI$0000000l  //  do not use minutes or seconds
+Define TIME_NOSECONDS           for |CI$00000002  //  do not use seconds
+Define TIME_NOTIMEMARKER        for |CI$00000004  //  do not use time marker
+Define TIME_FORCE24HOURFORMAT   for |CI$00000008  //  always use 24 hour format
+
+//  Date Flags for GetDateFormatW.
+//
+Define DATE_SHORTDATE           for |CI$0000000l  //  use short date picture
+Define DATE_LONGDATE            for |CI$00000002  //  use long date picture
+Define DATE_USE_ALT_CALENDAR    for |CI$00000004  //  use alternate calendar (if any)
+
+
+// Courtesy Of Vincent Oorsprong
+Function vConvertFileDateTime Global DWord dwLowDateTime DWord dwHighDateTime Returns String
+  String  sftTime sSystemTime sFormattedTime sFormattedDate
+  Pointer lpsftTime lpsSystemTime lpsFormattedTime lpsFormattedDate
+  Integer iSuccess iLenCcTime iDataLength iLenCcDate
+
+  ZeroType vFileTime  to sftTime
+  Put dwLowDateTime  to sftTime At vFileTime.dwLowDateTime
+  Put dwHighDateTime to sftTime At vFileTime.dwHighDateTime
+  GetAddress of sftTime to lpsftTime
+
+  ZeroType vSystemTime to sSystemTime
+  GetAddress of sSystemTime to lpsSystemTime
+
+  Moveint (vWin32_FileTimeToSystemTime (lpsftTime, lpsSystemTime)) to iSuccess
+  If iSuccess Eq DfTrue Begin
+    ZeroString 255 to sFormattedTime
+    GetAddress of sFormattedTime to lpsFormattedTime
+    Length sFormattedTime to iLenCcTime
+    Moveint (vWin32_GetTimeFormat (LOCALE_USER_DEFAULT, 0, lpsSystemTime, 0, ;
+                             lpsFormattedTime, iLenCcTime)) to iDataLength
+    ZeroString 255 to sFormattedDate
+    GetAddress of sFormattedDate to lpsFormattedDate
+    Length sFormattedDate to iLenCcDate
+    Moveint (vWin32_GetDateFormat (LOCALE_USER_DEFAULT, 0, lpsSystemTime, 0, ;
+                             lpsFormattedDate, iLenCcDate)) to iDataLength
+    Function_Return (Cstring (sFormattedDate)  * Cstring (sFormattedTime))
+  End // iSuccess
+End_Function // vConvertFileDateTime
+
+
+
+External_Function vWin32_SetLastError "SetLastError" Kernel32.Dll DWord dwLastError Returns Integer
+
+// **WvA:
+// A windows replacement for the standard function FileExists.
+// This version will also return (true) for a file when it is open by an application.
+// Note that you can apply normal windows mask-signs in the filename such as * and ?
+// Example: Get vFilePathExists "C:\config.sy?"
+// This will return true if you have a file matching these conditions. (aka config.sys)
+Function vFilePathExists Global String sFilePathMask Returns Integer
+  String  sWin32FindData
+  String  sLongFileName
+  Pointer lpsFilePathMask lpsWin32FindData
+  Handle  hFindFile
+  Integer iVoid iRetval bFound
+
+  GetAddress of sFilePathMask to lpsFilePathMask
+  Zerotype vWin32_Find_Data to sWin32FindData
+  GetAddress of sWin32FindData to lpswin32FindData
+  Move (vWin32_FindFirstFile (lpsFilePathMask, lpsWin32FindData)) to hFindFile
+  Move (vWin32_FindClose (hFindFile)) to iVoid
+  Function_Return (hFindFile <> vINVALID_HANDLE_VALUE)
+End_Function // vFilePathExists
+
+// **WvA
+// Formats a foldername by first trimming it and after that by sticking a
+// directory separator (/\) to the end if it doesn't have one there already.
+// The folder may contain a drive letter or UNC encoding.
+Function vFolderFormat Global String sFolderName Returns String
+  String sDirSep
+  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSep  // normally \ (backslash)
+  Move (Trim(sFolderName)) to sFolderName
+  If (Right(sFolderName,1)<>sDirSep) Begin
+    Move (sFolderName+sDirSep) to sFolderName
+  End
+  Function_Return sFolderName
+End_Function // vFolderFormat
