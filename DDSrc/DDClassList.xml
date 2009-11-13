@@ -1,2 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<DataDictionaryList xmlns="http://www.dataaccess.com/VisualDataFlex/2006/DataDictionaryList/"><DDClasses></DDClasses></DataDictionaryList>
+<DataDictionaryList xmlns="http://www.dataaccess.com/VisualDataFlex/2008/DataDictionaryList/"><Tables><Table><tableNumber>1</tableNumber><tableName>Flags</tableName><DDClasses><DDClass><className>cFlagsDataDictionary</className><classFile>cFlagsDataDictionary.dd</classFile><preferred>true</preferred></DDClass></DDClasses></Table></Tables></DataDictionaryList>

@@ -4,3 +4,4 @@ Version=14.1
 ConfigFile=.\Programs\Config.ws
 [Projects]
 Project0=Crystal2XML.src
+Project1=WebApp.src
