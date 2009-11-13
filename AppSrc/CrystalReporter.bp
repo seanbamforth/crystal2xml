@@ -1,15 +1,79 @@
 Use Batchdd.pkg
+Use ReportNotifier.bp
+Use vwin32fh.pkg
+Use Flexml.pkg
 
 Object oCrystalReporter is a BusinessProcess
     Property Handle phProgressNotifier 0
+    Property String psFolderName 
     
     Procedure UpdateProgress String sProgress
         If ((phProgressNotifier(Self))=0) Showln sProgress 
         Else Send UpdateProgress to (phProgressNotifier(Self)) sProgress
     End_Procedure
 
+    //This is the bit which converts the report structure to XML.
+    //I'm amazed this has to be done manually. 
+    Procedure ReportStruct2XML tXMLCrystalReport ReportStruct Handle hXMLNode
+        Send AddElement of (hXMLNode) "LastEdit" ReportStruct.LastEditedBy
+        Send AddElement of (hXMLNode) "ReportName" ReportStruct.ReportName
+    End_Procedure
+
+    Procedure ProcessSingleReport String sReportName 
+        tXMLCrystalReport ReportStruct
+        Handle hoXMLDocument hoRoot
+        Integer iError
+        
+        Send UpdateProgress ("Process report file: "+sReportName)
+        Get ReportDetail of oReportNotifier sReportName to ReportStruct
+        
+        Get Create U_cXMLDomDocument to hoXMLDocument
+        Get CreateDocumentElement of hoXMLDocument "CrystalReport" to hoRoot
+        Send ReportStruct2XML ReportStruct hoRoot
+        
+        Set psDocumentName of hoXMLDocument to (sReportName+".XML")
+        Get SaveXmlDocument of hoXMLDocument to iError
+        If (iError<>0) Begin 
+            Send UpdateProgress ("Error creating XML File: "+sReportName)
+        End
+        Send Destroy to hoXMLDocument
+    End_Procedure
+    
     Procedure OnProcess
-        Send UpdateProgress "Need to move through all .rpt files in the passed folder"
+        String sFolderName 
+        Integer iCH
+        String sFileName
+        String sXMLFile 
+        Boolean isReportOK 
+        
+        Get psFolderName to sFolderName 
+        If ((Right(sFolderName,1))<>"\") Append sFolderName "\"
+
+        Send UpdateProgress ("Report Folder: "+sFolderName)
+        
+        Get Seq_New_Channel to iCh  
+        Direct_Input channel iCH ("DIR:"+sFolderName+"a*.rpt")
+        Repeat
+            Readln channel iCH sFileName
+            Move (True) to isReportOK
+            
+            If (sFileName = "") Begin 
+                Move (False) to isReportOK 
+            End
+
+            If (isReportOK) Begin 
+                Move (sFolderName+sFileName+".XML") to sXMLFile 
+                If (vFilePathExists(sXMLFile)) Begin 
+                    Send UpdateProgress ("XML File already exists ["+sXMLFile+"]")
+                    Move (False) to isReportOK 
+                End
+            End
+            
+            If (isReportOK) Begin 
+                Send ProcessSingleReport (sFolderName+sFileName)
+            End
+        Until (SeqEof)
+        Close_Input channel iCH
     End_Procedure
 
 End_Object

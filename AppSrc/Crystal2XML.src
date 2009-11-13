@@ -282,6 +282,7 @@ Object oMain is a Panel
         Use StdAbout.pkg
         Use ExportToXML.vw
         Use CrystalReporter.bp
+        Use ReportNotifier.bp
 
         Procedure Activate_About
             Send DoAbout "" "" "" "" ""

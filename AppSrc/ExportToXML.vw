@@ -29,6 +29,7 @@ Object oExportToXML is a dbView
         
             Procedure OnClick
                 Set phProgressNotifier of oCrystalReporter to (grpInformation(Self)) 
+                Set psFolderName of oCrystalReporter to (Value(frmDirectory))
                 Send DoProcess to oCrystalReporter 
             End_Procedure
         

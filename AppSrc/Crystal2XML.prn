@@ -1,5 +1,5 @@
 Compiling Program: E:\vdf14.1\Crystal2XML\AppSrc\Crystal2XML.src
-Memory Available: 2147483647
+Memory Available: 2103394303
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.pkd    (C:\Program Files (x86)\Visual DataFlex 14.1\Pkg\dfallent.pkd)
@@ -2099,104 +2099,2917 @@ Including file: ExportToXML.vw    (E:\vdf14.1\crystal2xml\AppSrc\ExportToXML.vw)
 50041>>>Use CrystalReporter.bp
 Including file: CrystalReporter.bp    (E:\vdf14.1\crystal2xml\AppSrc\CrystalReporter.bp)
 50041>>>>>Use Batchdd.pkg
-50041>>>>>
-50041>>>>>Object oCrystalReporter is a BusinessProcess
-50043>>>>>    Property Handle phProgressNotifier 0
-50045>>>>>    
-50045>>>>>    Procedure UpdateProgress String sProgress
-50048>>>>>        If ((phProgressNotifier(Self))=0) Showln sProgress 
-50052>>>>>        Else Send UpdateProgress to (phProgressNotifier(Self)) sProgress
-50054>>>>>    End_Procedure
-50055>>>>>
-50055>>>>>    Procedure OnProcess
-50058>>>>>        Send UpdateProgress "Need to move through all .rpt files in the passed folder"
-50059>>>>>    End_Procedure
-50060>>>>>
-50060>>>>>End_Object
-50061>>>>>
-50061>>>
-50061>>>Deferred_View Activate_oExportToXML for ;Object oExportToXML is a dbView
-50086>>>
-50086>>>    Set Border_Style to Border_Thick
-50087>>>    Set Size to 283 443
-50088>>>    Set Location to 2 2
-50089>>>    Set Label to "Export .RPT Files as .XML"
-50090>>>
-50090>>>    Object oGroup1 is a Group
-50092>>>        Set Size to 51 433
-50093>>>        Set Location to 6 5
-50094>>>        Set Label to "Initial Folder:"
-50095>>>
-50095>>>        Object frmDirectory is a Form
-50097>>>            Set Size to 13 215
-50098>>>            Set Location to 13 88
-50099>>>            Set Label to "Report Folder : "
-50100>>>        End_Object
-50101>>>
-50101>>>        Object btnConvert is a Button
-50103>>>            Set Size to 14 141
-50104>>>            Set Location to 30 88
-50105>>>            Set Label to "Save .RPT File Format as .XML"
-50106>>>        
-50106>>>            Procedure OnClick
-50109>>>                Set phProgressNotifier of oCrystalReporter to (grpInformation(Self)) 
-50110>>>                Send DoProcess to oCrystalReporter 
-50111>>>            End_Procedure
-50112>>>        
-50112>>>        End_Object
-50113>>>    End_Object
-50114>>>
-50114>>>    Object grpInformation is a Group
-50116>>>        Set Size to 158 432
-50117>>>        Set Location to 66 6
-50118>>>        Set Label to "Information:"
-50119>>>
-50119>>>        Object txtProgress is a cTextEdit
-50121>>>            Set Size to 137 417
-50122>>>            Set Location to 14 9
-50123>>>        End_Object
-50124>>>        
-50124>>>        Procedure updateProgress String sValue 
-50127>>>            Send AppendText of txtProgress (sValue+(character(10)))
-50128>>>        End_Procedure
-50129>>>        
-50129>>>    End_Object
-50130>>>
-50130>>>    Object btnClose is a Button
-50132>>>        Set Size to 14 88
-50133>>>        Set Location to 231 336
-50134>>>        Set Label to "Close"
-50135>>>    
-50135>>>        // fires when the button is clicked
-50135>>>        Procedure OnClick
-50138>>>            Send Close_Panel
-50139>>>        End_Procedure
-50140>>>    
-50140>>>    End_Object
-50141>>>
-50141>>>Cd_End_Object
-50143>>>>
-50143>        Use CrystalReporter.bp
-50143>
-50143>        Procedure Activate_About
-50146>            Send DoAbout "" "" "" "" ""
-50147>        End_Procedure
-50148>
-50148>    End_Object
-50149>
-50149>End_Object
-50150>
-50150>Start_UI
-50151>
+50041>>>>>Use ReportNotifier.bp
+Including file: ReportNotifier.bp    (E:\vdf14.1\crystal2xml\AppSrc\ReportNotifier.bp)
+50041>>>>>>>Use Batchdd.pkg
+50041>>>>>>>
+50041>>>>>>>Struct tXMLCrystalReport 
+50041>>>>>>>    String ReportName 
+50041>>>>>>>    String LastEditedBy
+50041>>>>>>>    //the rest of the report structure needs to go in here. 
+50041>>>>>>>End_Struct
+50041>>>>>>>
+50041>>>>>>>
+50041>>>>>>>Object oReportNotifier is a BusinessProcess
+50043>>>>>>>    
+50043>>>>>>>    Function ReportDetail String sReport Returns tXMLCrystalReport 
+50046>>>>>>>        tXMLCrystalReport XMLReport
+50046>>>>>>>        tXMLCrystalReport XMLReport
+50046>>>>>>>        
+50046>>>>>>>        Move sReport to XMLReport.ReportName
+50047>>>>>>>        Move "Testing" to XMLReport.LastEditedBy
+50048>>>>>>>        
+50048>>>>>>>        Function_Return XMLReport
+50049>>>>>>>    End_Function
+50050>>>>>>>    
+50050>>>>>>>
+50050>>>>>>>    Procedure OnProcess
+50053>>>>>>>    End_Procedure
+50054>>>>>>>
+50054>>>>>>>End_Object
+50055>>>>>>>
+50055>>>>>Use vwin32fh.pkg
+Including file: vwin32fh.pkg    (E:\vdf14.1\crystal2xml\AppSrc\vwin32fh.pkg)
+50055>>>>>>>// This code is part of VDF GUIdance
+50055>>>>>>>// Visit us @ http://www.vdf-guidance.com
+50055>>>>>>>// e-Mail us @ info@vdf-guidance.com
+50055>>>>>>>// VDF GUIdance is a mutual project of
+50055>>>>>>>// Frank Vandervelpen - Vandervelpen Systems and
+50055>>>>>>>// Wil van Antwerpen  - Antwise Solutions
+50055>>>>>>>// All software source code should be used <<AS IS>> without any warranty.
+50055>>>>>>>//
+50055>>>>>>>//
+50055>>>>>>>// *** Windows 32 bit file handling wrapper class ***
+50055>>>>>>>//
+50055>>>>>>>
+50055>>>>>>>// 05-09-2000 **WvA: Changed namingconvention of all classes and methods to new standard
+50055>>>>>>>//                   This may be painfull for some of you, but it was really needed as it was
+50055>>>>>>>//                   getting messy. The "vs" -prefix we used before was confusing and could
+50055>>>>>>>//                   unintentionally have been interpreted as "Vdf-GUIdance String".
+50055>>>>>>>//
+50055>>>>>>>// The used naming-convention is:
+50055>>>>>>>//     - a prefix of "vWin32_" for every external function declaration
+50055>>>>>>>//     - a prefix of the letter "v" for the full API name for the vdf-wrapper function.
+50055>>>>>>>//
+50055>>>>>>>// By using this we are guarding ourselves for conflicts with variable declarations
+50055>>>>>>>// of DataAccess in the future.
+50055>>>>>>>//
+50055>>>>>>>//                   vSHGetFolderPath added to retrieve the new shell folders
+50055>>>>>>>//                   vGetWindowsDirectory
+50055>>>>>>>//
+50055>>>>>>>//                   vGetTempFileName
+50055>>>>>>>//                   vGetTempPath
+50055>>>>>>>// 11-17-2001 **WvA: Removed User Interface Error popups such as Error handling.
+50055>>>>>>>//                   This is an absolute need for WebApp. We expect you to handle the
+50055>>>>>>>//                   error in your application anyways. Changed this for:
+50055>>>>>>>//                   vDeleteFile, vCopyFile, vMoveFile and vRenameFile
+50055>>>>>>>// 03-02-2002 **WvA: vRemoveDirectory added
+50055>>>>>>>// 03-11-2002 **WvA: The parameter lpdword in the external function declaration for
+50055>>>>>>>//                   vWin32_SHBrowsForFolder can cause compiler errors.
+50055>>>>>>>//                   It is renamed too avoid this.
+50055>>>>>>>// 11-11-2002 **WvA: Codecleanup, vcSelectFile_Dialog is now cvSelectFile_Dialog, its
+50055>>>>>>>//                   function vSelectedFileName is now just SelectedFileName
+50055>>>>>>>//                   Removed the local keyword in the variable declarations
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>Use Case.mac
+50055>>>>>>>Use File_Dlg.pkg      // Contains OpenDialog class definition
+50055>>>>>>>Use Seq_chnl.pkg
+50055>>>>>>>
+50055>>>>>>>Use windows
+50055>>>>>>>Use Dferror
+50055>>>>>>>Use Dll
+50055>>>>>>>
+50055>>>>>>>Define vMax_Path     for |CI260
+50055>>>>>>>Define vMinChar      for |CI$80
+50055>>>>>>>Define vMaxChar      for |CI$7F
+50055>>>>>>>Define vMinShort     for |CI$8000
+50055>>>>>>>Define vMaxShort     for |CI$7FFF
+50055>>>>>>>Define vMinLong      for |CI$80000000
+50055>>>>>>>Define vMaxLong      for |CI$7FFFFFFF
+50055>>>>>>>Define vMaxByte      for |CI$FF
+50055>>>>>>>Define vMaxWord      for |CI$FFFF
+50055>>>>>>>Define vMaxDword     for |CI$FFFFFFFF
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>// For FindFirstFile
+50055>>>>>>>Define vINVALID_HANDLE_VALUE   for |CI-1
+50055>>>>>>>Define vINVALID_FILE_SIZE      for |CI$FFFFFFFF
+50055>>>>>>>Define vERROR_NO_MORE_FILES    for |CI18
+50055>>>>>>>
+50055>>>>>>>// The defines below can be used to find out what kind of error has occured if
+50055>>>>>>>// the API-call ShellExecute is used.
+50055>>>>>>>Define vERROR_FILE_NOT_FOUND   for |CI0002
+50055>>>>>>>Define vERROR_PATH_NOT_FOUND   for |CI0003
+50055>>>>>>>Define vERROR_BAD_FORMAT       for |CI0011
+50055>>>>>>>Define vSE_ERR_ACCESSDENIED    for |CI0005
+50055>>>>>>>Define vSE_ERR_ASSOCINCOMPLETE for |CI0027
+50055>>>>>>>Define vSE_ERR_DDEBUSY         for |CI0030
+50055>>>>>>>Define vSE_ERR_DDEFAIL         for |CI0029
+50055>>>>>>>Define vSE_ERR_DDETIMEOUT      for |CI0028
+50055>>>>>>>Define vSE_ERR_DLLNOTFOUND     for |CI0032
+50055>>>>>>>Define vSE_ERR_FNF             for |CI0002
+50055>>>>>>>Define vSE_ERR_NOASSOC         for |CI0031
+50055>>>>>>>Define vSE_ERR_OOM             for |CI0008
+50055>>>>>>>Define vSE_ERR_PNF             for |CI0003
+50055>>>>>>>Define vSE_ERR_SHARE           for |CI0026
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>
+50055>>>>>>>// *WvA: 13-01-1999 Created
+50055>>>>>>>// The Class cSelectFile_Dialog is created to support the function Select_File
+50055>>>>>>>// This function opens the Windows standard file open dialog and returns the selected
+50055>>>>>>>// file_name.
+50055>>>>>>>Class cvSelectFile_Dialog is an OpenDialog
+50056>>>>>>>
+50056>>>>>>>  Procedure Construct_Object Integer iImage_Id
+50058>>>>>>>    Forward Send Construct_Object iImage_Id
+50060>>>>>>>    Set HideReadOnly_State to True
+50061>>>>>>>  End_Procedure // Construct_Object
+50062>>>>>>>
+50062>>>>>>>  Function SelectedFileName Returns String
+50064>>>>>>>    String sFile_Name
+50064>>>>>>>    If (Show_Dialog(current_object)) Begin
+50066>>>>>>>      Move (File_Name(Self)) to sFile_Name
+50067>>>>>>>      Function_Return (Trim(sFile_Name))
+50068>>>>>>>    End
+50068>>>>>>>>
+50068>>>>>>>    Function_Return ''
+50069>>>>>>>  End_Function // SelectedFileName
+50070>>>>>>>End_Class // cvSelectFile_Dialog
+50071>>>>>>>
+50071>>>>>>>// *WvA: 13-01-1999 Created
+50071>>>>>>>// This function opens the Windows standard file open dialog and returns the selected
+50071>>>>>>>// file_name. Returns '' if the user didn't make a selection.
+50071>>>>>>>Function vSelect_File Global String sSupportedFileTypes String sCaptionText ;  String sInitial_Folder Returns String
+50073>>>>>>>  String sSelected_File
+50073>>>>>>>  Object oSelectFile_Dialog is a cvSelectFile_Dialog
+50075>>>>>>>    Set Dialog_Caption  to sCaptionText
+50076>>>>>>>    Set Filter_String   to sSupportedFileTypes
+50077>>>>>>>    Set Initial_Folder  to sInitial_Folder
+50078>>>>>>>  End_Object // oSelectFile_Dialog
+50079>>>>>>>  Function_Return (SelectedFileName(oSelectFile_Dialog(Self)))
+50080>>>>>>>End_Function // vSelect_File
+50081>>>>>>>
+50081>>>>>>>// These functions will only work if you include the packages of vdfquery
+50081>>>>>>>//
+50081>>>>>>>//// Pre:  sFileName contains the complete path of the file.
+50081>>>>>>>//// Post: returns the complete path of the file.
+50081>>>>>>>//// This function is inspired on function SEQ_ExtractPathFromFileName of Sture Andersen.
+50081>>>>>>>//Function ParseFolderName Global String sFileName Returns String
+50081>>>>>>>//  String sFolderName
+50081>>>>>>>//  String sDirSeperator // this is "\" for windows, or "/" for unix
+50081>>>>>>>//  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSeperator
+50081>>>>>>>//  If sDirSeperator in sFileName function_return (StripFromLastOccurance(sFileName,sDirSeperator))
+50081>>>>>>>//  if ":" in sFileName function_return (StripFromLastOccurance(sFileName,":"))
+50081>>>>>>>//  Function_Return sFolderName
+50081>>>>>>>//End_Function // ParseFolderName
+50081>>>>>>>
+50081>>>>>>>
+50081>>>>>>>//// Pre:  sFileName contains the complete path of the file.
+50081>>>>>>>//// post: The returned filename will have a extension
+50081>>>>>>>//Function ParseFileName Global String sFileName Returns String
+50081>>>>>>>//  String sFolderName
+50081>>>>>>>//  String sDirSeperator // this is "\" for windows, or "/" for unix
+50081>>>>>>>//  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSeperator
+50081>>>>>>>//  Get ParseFolderName sFileName To sFolderName
+50081>>>>>>>//  If (sFolderName NE "") replace sFolderName in sFileName with ""
+50081>>>>>>>//  replace sDirSeperator in sFileName with ""
+50081>>>>>>>//  Function_Return sFilename
+50081>>>>>>>//End_Function // ParseFileName
+50081>>>>>>>
+50081>>>>>>>
+50081>>>>>>>//// Pre:  sFileName may contain the complete path of the file.
+50081>>>>>>>//// Post: returns the extension only, this extension can be a valid unixlike extension
+50081>>>>>>>////       such as "html" or "java"
+50081>>>>>>>//Function ParseFileExtension Global String sFileName Returns String
+50081>>>>>>>//  String sFileExtension
+50081>>>>>>>//  If "." in sFileName Begin
+50081>>>>>>>//    Move sFileName To sFileExtension
+50081>>>>>>>//    Move (StripFromLastOccurance(sFileName,".")) To sFileName
+50081>>>>>>>//    If (sFileName NE "") replace sFileName in sFileExtension with ""
+50081>>>>>>>//    Else Move "" To sFileExtension
+50081>>>>>>>//    If (sFileName NE "") replace "." in sFileExtension with ""
+50081>>>>>>>//    End
+50081>>>>>>>//  Function_Return sFileExtension
+50081>>>>>>>//End_Function // ParseFileExtension
+50081>>>>>>>
+50081>>>>>>>Function DDE_Error_To_String Integer iErrorID Returns String
+50084>>>>>>>  String sMessage
+50084>>>>>>>  Case Begin
+50084>>>>>>>    Case (iErrorID = vERROR_FILE_NOT_FOUND)
+50086>>>>>>>      Append sMessage "The specified file was not found.\n"
+50087>>>>>>>      Case Break
+50088>>>>>>>    Case (iErrorID = vERROR_PATH_NOT_FOUND)
+50091>>>>>>>      Append sMessage "The specified path was not found.\n"
+50092>>>>>>>      Case Break
+50093>>>>>>>    Case (iErrorID = vERROR_BAD_FORMAT)
+50096>>>>>>>      Append sMessage "The .EXE file is invalid.\n"
+50097>>>>>>>      Case Break
+50098>>>>>>>    Case (iErrorID = vSE_ERR_ACCESSDENIED)
+50101>>>>>>>      Append sMessage "The operating system denied access to the specified file.\n"
+50102>>>>>>>      Case Break
+50103>>>>>>>    Case (iErrorID = vSE_ERR_ASSOCINCOMPLETE)
+50106>>>>>>>      Append sMessage "The filename association is incomplete or invalid.\n"
+50107>>>>>>>      Case Break
+50108>>>>>>>    Case (iErrorID = vSE_ERR_DDEBUSY)
+50111>>>>>>>      Append sMessage "The DDE transaction could not be completed because other DDE\n"
+50112>>>>>>>      Append sMessage "transactions were being processed.\n"
+50113>>>>>>>      Case Break
+50114>>>>>>>    Case (iErrorID = vSE_ERR_DDEFAIL)
+50117>>>>>>>      Append sMessage "The DDE transaction failed.\n"
+50118>>>>>>>      Case Break
+50119>>>>>>>    Case (iErrorID = vSE_ERR_DDETIMEOUT)
+50122>>>>>>>      Append sMessage "The DDE transaction could not be completed,\n"
+50123>>>>>>>      Append sMessage "because the request timed out.\n"
+50124>>>>>>>      Case Break
+50125>>>>>>>    Case (iErrorID = vSE_ERR_DLLNOTFOUND)
+50128>>>>>>>      Append sMessage "The specified dynamic-link library was not found.\n"
+50129>>>>>>>      Case Break
+50130>>>>>>>    Case (iErrorID = vSE_ERR_NOASSOC)
+50133>>>>>>>      Append sMessage "There is no application associated with the given filename extension.\n"
+50134>>>>>>>      Case Break
+50135>>>>>>>    Case ((iErrorID = vSE_ERR_OOM) or (iErrorID = 0))
+50138>>>>>>>      Append sMessage "There is not enough free memory available to complete the operation.\n"
+50139>>>>>>>      Case Break
+50140>>>>>>>    Case (iErrorID = vSE_ERR_PNF)
+50143>>>>>>>      Append sMessage "The specified path was not found.\n"
+50144>>>>>>>      Case Break
+50145>>>>>>>    Case (iErrorID = vSE_ERR_SHARE)
+50148>>>>>>>      Append sMessage "A sharing violation occurred.\n"
+50149>>>>>>>      Case Break
+50150>>>>>>>    Case Else
+50150>>>>>>>      Append sMessage "Unknown DDE-error occurred.\n"
+50151>>>>>>>      Append sMessage ("Errornumber"*trim(iErrorID)*".\n")
+50152>>>>>>>      Case Break
+50153>>>>>>>  Case End
+50153>>>>>>>  Function_Return sMessage
+50154>>>>>>>End_Function // DDE_Error_To_String
+50155>>>>>>>
+50155>>>>>>>
+50155>>>>>>>Procedure vDDE_Error_Handler Integer iErrorID
+50158>>>>>>>  String sMessage
+50158>>>>>>>  Get DDE_Error_To_String to sMessage
+50159>>>>>>>  Append sMessage "\nPress a key to continue...\n\n"
+50160>>>>>>>  Send Stop_Box sMessage "a DDE-error occured"
+50161>>>>>>>End_Procedure // vDDE_Error_Handler hInstance
+50162>>>>>>>
+50162>>>>>>>
+50162>>>>>>>// Does the directory exist? - No = 0, Yes = 1
+50162>>>>>>>// This also works with UNC path encoding and wildcards
+50162>>>>>>>Function vFolderExists Global String sFolderName Returns Integer
+50164>>>>>>>  String  sFolder sTmp
+50164>>>>>>>  Integer bFolderExists iCh
+50164>>>>>>>
+50164>>>>>>>  Move dfTrue to bFolderExists
+50165>>>>>>>  Move "dir:" to sFolder
+50166>>>>>>>  Append sFolder sFolderName
+50167>>>>>>>  Get Seq_New_Channel to iCh  // get free channel for input
+50168>>>>>>>  Direct_Input channel iCh sFolder
+50170>>>>>>>    Repeat
+50170>>>>>>>>
+50170>>>>>>>      Readln channel iCh sTmp
+50172>>>>>>>      If (trim(sTmp)="") Move dfFalse to bFolderExists
+50175>>>>>>>      Else Begin
+50176>>>>>>>        Move dfTrue to bFolderExists
+50177>>>>>>>        indicate SeqEof True  // end loop
+50178>>>>>>>        End
+50178>>>>>>>>
+50178>>>>>>>    Until (SeqEof)
+50180>>>>>>>  Close_Input channel iCh
+50182>>>>>>>  Send Seq_Release_Channel iCh
+50183>>>>>>>  Function_Return bFolderExists
+50184>>>>>>>End_Function  // vFolderExists
+50185>>>>>>>
+50185>>>>>>>
+50185>>>>>>>
+50185>>>>>>>// C-Structure
+50185>>>>>>>//typedef struct _browseinfo {
+50185>>>>>>>//    HWND hwndOwner;
+50185>>>>>>>//    LPCITEMIDLIST pidlRoot;
+50185>>>>>>>//    LPSTR pszDisplayName;
+50185>>>>>>>//    LPCSTR lpszTitle;
+50185>>>>>>>//    UINT ulFlags;
+50185>>>>>>>//    BFFCALLBACK lpfn;
+50185>>>>>>>//    LPARAM lParam;
+50185>>>>>>>//    int iImage;
+50185>>>>>>>//} BROWSEINFO, *PBROWSEINFO, *LPBROWSEINFO;
+50185>>>>>>>
+50185>>>>>>>//declare C structure struct_browseinfo
+50185>>>>>>>//as documented in MSDN under Windows Shell API
+50185>>>>>>>Type vtBrowseInfo
+50185>>>>>>>  Field vtBrowseInfo.hWndOwner      as Handle
+50185>>>>>>>  Field vtBrowseInfo.pIDLRoot       as Pointer
+50185>>>>>>>  Field vtBrowseInfo.pszDisplayName as Pointer
+50185>>>>>>>  Field vtBrowseInfo.lpszTitle      as Pointer
+50185>>>>>>>  Field vtBrowseInfo.ulFlags        as DWord
+50185>>>>>>>  Field vtBrowseInfo.lpfnCallback   as Pointer
+50185>>>>>>>  Field vtBrowseInfo.lParam         as DWord
+50185>>>>>>>  Field vtBrowseInfo.iImage         as DWord
+50185>>>>>>>End_Type // tBrowseInfo
+50185>>>>>>>
+50185>>>>>>>// Browsing for directory.
+50185>>>>>>>Define vBIF_RETURNONLYFSDIRS   for |CI$0001  // For finding a folder to start document searching
+50185>>>>>>>Define vBIF_DONTGOBELOWDOMAIN  for |CI$0002  // For starting the Find Computer
+50185>>>>>>>Define vBIF_STATUSTEXT         for |CI$0004  // Includes a status area in the dialog box.
+50185>>>>>>>                                            // The callback function can set the status text by
+50185>>>>>>>                                            // sending messages to the dialog box.
+50185>>>>>>>Define vBIF_RETURNFSANCESTORS  for |CI$0008  // Only returns file system ancestors.
+50185>>>>>>>
+50185>>>>>>>Define vBIF_BROWSEFORCOMPUTER  for |CI$1000  // Browsing for Computers.
+50185>>>>>>>Define vBIF_BROWSEFORPRINTER   for |CI$2000  // Browsing for Printers
+50185>>>>>>>
+50185>>>>>>>// message from browser
+50185>>>>>>>//Define BFFM_INITIALIZED        1
+50185>>>>>>>//Define BFFM_SELCHANGED         2
+50185>>>>>>>
+50185>>>>>>>// messages to browser
+50185>>>>>>>//Define BFFM_SETSTATUSTEXT      (WM_USER + 100)
+50185>>>>>>>//Define BFFM_ENABLEOK           (WM_USER + 101)
+50185>>>>>>>//Define BFFM_SETSELECTION       (WM_USER + 102)
+50185>>>>>>>
+50185>>>>>>>
+50185>>>>>>>External_Function vWin32_SHBrowseForFolder "SHBrowseForFolder" shell32.dll ;  Pointer lpsBrowseInfo Returns DWord
+50186>>>>>>>
+50186>>>>>>>External_Function vWin32_SHGetPathFromIDList "SHGetPathFromIDList" shell32.dll ;  Pointer pidList Pointer lpBuffer Returns DWord
+50187>>>>>>>
+50187>>>>>>>External_Function vWin32_CoTaskMemFree "CoTaskMemFree" ole32.dll Pointer pV Returns Integer
+50188>>>>>>>
+50188>>>>>>>// returns folder name if a folder was selected, otherwise returns ""
+50188>>>>>>>Function vSHBrowseForFolder Global String sDialogTitle Returns String
+50190>>>>>>>  String sFolder sBrowseInfo sTitle
+50190>>>>>>>  Pointer lpItemIdList lpsFolder lpsBrowseInfo lpsTitle
+50190>>>>>>>  Integer iFolderSelected iRetval
+50190>>>>>>>
+50190>>>>>>>  // fill string variable with null characters
+50190>>>>>>>  ZeroType vtBrowseInfo to sBrowseInfo
+50191>>>>>>>
+50191>>>>>>>  If (sDialogTitle<>"") Begin
+50193>>>>>>>    Move sDialogTitle to sTitle
+50194>>>>>>>    // Torben Lund suggested converting the string with toansi. Doing it like that
+50194>>>>>>>    // disables showing some commonly used ascii characters like ascii 137 (%)
+50194>>>>>>>    // These chars are correctly shown if no toansi is used.
+50194>>>>>>>    // I can imagine that he wanted to path to be ANSI, but as long as it isa just
+50194>>>>>>>    // selected it will always be valid.
+50194>>>>>>>    GetAddress of sTitle to lpsTitle
+50195>>>>>>>    Put lpsTitle to sBrowseInfo at vtBrowseInfo.lpszTitle
+50196>>>>>>>  End
+50196>>>>>>>>
+50196>>>>>>>
+50196>>>>>>>  Put vBIF_RETURNONLYFSDIRS to sBrowseInfo at vtBrowseInfo.ulFlags
+50197>>>>>>>
+50197>>>>>>>  // Torben Lund added line below. Move handle of focus object to structure before
+50197>>>>>>>  // calling function. Otherwise, the folderdialog will be started as a seperate task.
+50197>>>>>>>  Put (window_handle(focus(desktop))) to sBrowseInfo at vtBrowseInfo.hWndOwner
+50198>>>>>>>
+50198>>>>>>>  GetAddress of sBrowseInfo to lpsBrowseInfo
+50199>>>>>>>
+50199>>>>>>>  // null 128 chars into var (make space)
+50199>>>>>>>  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+50200>>>>>>>  GetAddress of sFolder to lpsFolder
+50201>>>>>>>
+50201>>>>>>>  // select folder
+50201>>>>>>>  Move (vWin32_SHBrowseForFolder(lpsBrowseInfo)) to lpItemIdList
+50202>>>>>>>  // get selected folder name
+50202>>>>>>>  Move (vWin32_SHGetPathFromIDList(lpItemIdList, lpsFolder)) to iFolderSelected
+50203>>>>>>>
+50203>>>>>>>  // release memory resources that are used by the ItemIdList
+50203>>>>>>>  Move (vWin32_CoTaskMemFree(lpItemIdList)) to iRetval
+50204>>>>>>>
+50204>>>>>>>  If (iFolderSelected<>0) Function_Return (CString(sFolder))
+50207>>>>>>>  Else Function_Return ""
+50209>>>>>>>End_Function // vSHBrowseForFolder
+50210>>>>>>>
+50210>>>>>>>
+50210>>>>>>>
+50210>>>>>>>Type vtSecurity_attributes
+50210>>>>>>>  Field vtSecurity_attributes.nLength        as DWord
+50210>>>>>>>  Field vtSecurity_attributes.lpDescriptor   as Pointer
+50210>>>>>>>  Field vtSecurity_attributes.bInheritHandle as Integer
+50210>>>>>>>End_Type // vtSecurity_attributes
+50210>>>>>>>
+50210>>>>>>>//nLength:
+50210>>>>>>>// Specifies the size, in bytes, of this structure. Set this value to the size of the
+50210>>>>>>>// SECURITY_ATTRIBUTES structure.
+50210>>>>>>>// Windows NT: Some functions that use the SECURITY_ATTRIBUTES structure do not verify the
+50210>>>>>>>// value of the nLength member. However, an application should still set it properly.
+50210>>>>>>>// That ensures current, future, and cross-platform compatibility.
+50210>>>>>>>//
+50210>>>>>>>//lpSecurityDescriptor:
+50210>>>>>>>// Points to a security descriptor for the object that controls the sharing of it.
+50210>>>>>>>// If NULL is specified for this member, the object may be assigned the default security
+50210>>>>>>>// descriptor of the calling process.
+50210>>>>>>>//
+50210>>>>>>>//bInheritHandle:
+50210>>>>>>>// Specifies whether the returned handle is inherited when a new process is created.
+50210>>>>>>>// If this member is TRUE, the new process inherits the handle.
+50210>>>>>>>
+50210>>>>>>>
+50210>>>>>>>// BOOL CreateDirectory(
+50210>>>>>>>//    LPCTSTR lpPathName,
+50210>>>>>>>//    LPSECURITY_ATTRIBUTES lpSecurityAttributes  // pointer to a security descriptor
+50210>>>>>>>//   );
+50210>>>>>>>//
+50210>>>>>>>// lpPathName
+50210>>>>>>>//  Points to a null-terminated string that specifies the path of the directory
+50210>>>>>>>//  to be created.
+50210>>>>>>>//  There is a default string size limit for paths of MAX_PATH characters.
+50210>>>>>>>//  This limit is related to how the CreateDirectory function parses paths.
+50210>>>>>>>// lpSecurityAttributes
+50210>>>>>>>//  Pointer to a SECURITY_ATTRIBUTES structure als called a security descriptor that
+50210>>>>>>>//  determines whether the returned handle can be inherited by child processes.
+50210>>>>>>>//  If lpSecurityAttributes is NULL, the handle cannot be inherited.
+50210>>>>>>>// Returns:
+50210>>>>>>>//  If the function succeeds, the return value is nonzero.
+50210>>>>>>>//  If the function fails, the return value is zero. To get extended error information, call GetLastError.
+50210>>>>>>>External_Function vWin32_CreateDirectory "CreateDirectoryA" kernel32.dll ;  Pointer lpPathName Pointer lpSecurity_Attributes Returns Integer
+50211>>>>>>>
+50211>>>>>>>
+50211>>>>>>>// lpPathName
+50211>>>>>>>//  Points to a null-terminated string that specifies the path of the directory
+50211>>>>>>>//  to be removed.
+50211>>>>>>>//  There is a default string size limit for paths of MAX_PATH characters.
+50211>>>>>>>// Returns:
+50211>>>>>>>//  If the function succeeds, the return value is nonzero.
+50211>>>>>>>//  If the function fails, the return value is zero. To get extended error information, call GetLastError.
+50211>>>>>>>External_Function vWin32_RemoveDirectory "RemoveDirectoryA" kernel32.dll ;  Pointer lpPathName Returns Integer
+50212>>>>>>>
+50212>>>>>>>
+50212>>>>>>>// returns 0 if the folder is created.
+50212>>>>>>>//         1 if the API-call returned an error.
+50212>>>>>>>Function vCreateDirectory Global String sNewFolder Returns Integer
+50214>>>>>>>  String  sFolder sSA
+50214>>>>>>>  Pointer lpsFolder lpsSecurity_Attributes lpDescriptor
+50214>>>>>>>  Integer iRetval bFolderCreated bInheritHandle
+50214>>>>>>>
+50214>>>>>>>  Move (False) to bFolderCreated
+50215>>>>>>>  // fill string variable with null characters
+50215>>>>>>>  ZeroType vtSecurity_attributes to sSA
+50216>>>>>>>
+50216>>>>>>>  // null MAX_PATH chars into var (make space)
+50216>>>>>>>  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+50217>>>>>>>
+50217>>>>>>>  If (sNewFolder <> "") Begin
+50219>>>>>>>
+50219>>>>>>>    Move dfTrue to  bInheritHandle
+50220>>>>>>>    // Setting this to NULL is already done by the zerotype command
+50220>>>>>>>    // Move NULL   To  lpDescriptor
+50220>>>>>>>    Put (length(sSA))   to sSA at vtSecurity_attributes.nLength
+50221>>>>>>>    //Put lpDescriptor To sSA at vtSecurity_attributes.lpDescriptor
+50221>>>>>>>    Put bInheritHandle to sSA at vtSecurity_attributes.bInheritHandle
+50222>>>>>>>
+50222>>>>>>>    GetAddress of sSA to lpsSecurity_Attributes
+50223>>>>>>>
+50223>>>>>>>    //
+50223>>>>>>>    Move sNewFolder to sFolder
+50224>>>>>>>    GetAddress of sFolder to lpsFolder
+50225>>>>>>>    Move (vWin32_CreateDirectory(lpsFolder, lpsSecurity_Attributes)) to bFolderCreated
+50226>>>>>>>  End
+50226>>>>>>>>
+50226>>>>>>>
+50226>>>>>>>  IfNot bFolderCreated Move 1 to iRetVal
+50229>>>>>>>  Function_Return iRetVal
+50230>>>>>>>End_Function // vCreateDirectory
+50231>>>>>>>
+50231>>>>>>>
+50231>>>>>>>// **WvA: 03-02-2002 Function created.
+50231>>>>>>>// With this function one can remove a directory.
+50231>>>>>>>// returns 0 if the folder is removed.
+50231>>>>>>>//         1 if the API-call returned an error (Use GetLastError API to get the details)
+50231>>>>>>>//         2 if the folder did not exist
+50231>>>>>>>//         3 if the sFolder parameter passed is equal to ""
+50231>>>>>>>Function vRemoveDirectory Global String sFolder Returns Integer
+50233>>>>>>>  String  sPath
+50233>>>>>>>  Pointer lpsPath
+50233>>>>>>>  Integer iRetval bRemoved bExists
+50233>>>>>>>
+50233>>>>>>>  Move (False) to bRemoved
+50234>>>>>>>  Move 0 to iRetVal
+50235>>>>>>>  Move (Trim(sFolder)) to sFolder
+50236>>>>>>>  If (sFolder="") Begin
+50238>>>>>>>    Move 3 to iRetVal
+50239>>>>>>>  End
+50239>>>>>>>>
+50239>>>>>>>  If (vFolderExists(sFolder)=False) Begin
+50241>>>>>>>    Move 2 to iRetVal
+50242>>>>>>>  End
+50242>>>>>>>>
+50242>>>>>>>  If (iRetVal=0) Begin
+50244>>>>>>>    // null MAX_PATH chars into var (make space)
+50244>>>>>>>    Move (Repeat(character(0), vMAX_PATH)) to sPath
+50245>>>>>>>    //
+50245>>>>>>>    Move (Insert(sFolder,sPath,1)) to sPath
+50246>>>>>>>    GetAddress of sPath to lpsPath
+50247>>>>>>>    Move (vWin32_RemoveDirectory(lpsPath)) to bRemoved
+50248>>>>>>>  End
+50248>>>>>>>>
+50248>>>>>>>
+50248>>>>>>>  If ((iRetVal=0) and (bRemoved=False)) Begin
+50250>>>>>>>    Move 1 to iRetVal
+50251>>>>>>>  End
+50251>>>>>>>>
+50251>>>>>>>  Function_Return iRetVal
+50252>>>>>>>End_Function // vRemoveDirectory
+50253>>>>>>>
+50253>>>>>>>
+50253>>>>>>>
+50253>>>>>>>// This function informs the user that he entered a yet unknown folder and
+50253>>>>>>>// asks if he/she wants to create the folder (Yes/No)
+50253>>>>>>>// Choice: "Yes" - this creates the folder
+50253>>>>>>>//                 if successful, the function returns false
+50253>>>>>>>//                 else it will be true.
+50253>>>>>>>// Choice: "No"  - returns TRUE, This allows the programmer to take action
+50253>>>>>>>//                 For example: to stop a save
+50253>>>>>>>// Precondition: A foldername must be entered. We do not check for empty paths
+50253>>>>>>>// This function returns a non-zero value if the folder isn't created afterwards
+50253>>>>>>>Function vVerifyNewFolder Global String sFolderName Returns Integer
+50255>>>>>>>  Integer bIsNotValid
+50255>>>>>>>  Integer iUsers_Choice
+50255>>>>>>>  String  sMessage
+50255>>>>>>>
+50255>>>>>>>  If (vFolderExists(sFolderName) EQ 0) Begin
+50257>>>>>>>    Move "The folder '" to sMessage
+50258>>>>>>>    Append sMessage sFolderName
+50259>>>>>>>    Append sMessage "' does not yet exist,\n"
+50260>>>>>>>    Append sMessage "Do you want to create it now?"
+50261>>>>>>>    Get YesNo_Box sMessage "Confirm" MB_DefButton1 to iUsers_Choice
+50262>>>>>>>    Case Begin
+50262>>>>>>>      Case (iUsers_Choice = MBR_Yes)
+50264>>>>>>>        Move (vCreateDirectory(sFolderName)) to bIsNotValid
+50265>>>>>>>        If bIsNotValid Begin
+50267>>>>>>>          Move "An error occurred while trying to create folder '" to sMessage
+50268>>>>>>>          Append sMessage sFolderName "'.\n\n"
+50270>>>>>>>          Send Info_Box sMessage "Info"
+50271>>>>>>>          End
+50271>>>>>>>>
+50271>>>>>>>        Case Break
+50272>>>>>>>      Case (iUsers_Choice = MBR_No)
+50275>>>>>>>        Move dfTrue to bIsNotValid // Cancel the save
+50276>>>>>>>        Case Break
+50277>>>>>>>    Case End
+50277>>>>>>>  End
+50277>>>>>>>>
+50277>>>>>>>  Function_Return bIsNotValid
+50278>>>>>>>End_Function // vVerifyNewFolder
+50279>>>>>>>
+50279>>>>>>>
+50279>>>>>>>// The ShellExecute function opens or prints a specified file. The file can be an
+50279>>>>>>>// executable file or a document file.
+50279>>>>>>>//
+50279>>>>>>>// Operation can be one of the following:
+50279>>>>>>>//    "OPEN"  The function opens the file specified by lpFile.
+50279>>>>>>>//            The file can be an executable file or a document file.
+50279>>>>>>>//            The file can be a folder to open.
+50279>>>>>>>//    "PRINT" The function prints the file specified by lpFile.
+50279>>>>>>>//            The file should be a document file. If the file is an executable file,
+50279>>>>>>>//            the function opens the file, as if "open" had been specified.
+50279>>>>>>>//  "EXPLORE" The function explores the folder specified by lpFile.
+50279>>>>>>>//
+50279>>>>>>>// Return Values:
+50279>>>>>>>//
+50279>>>>>>>// If the function succeeds, the return value is the instance handle of the application that
+50279>>>>>>>// was run, or the handle of a dynamic data exchange (DDE) server application.
+50279>>>>>>>// If the function fails, the return value is an error value that is less than or equal to 32.
+50279>>>>>>>//
+50279>>>>>>>// The following table lists these error values:
+50279>>>>>>>// Public Const ERROR_FILE_NOT_FOUND = 2&
+50279>>>>>>>// Public Const ERROR_PATH_NOT_FOUND = 3&
+50279>>>>>>>// Public Const ERROR_BAD_FORMAT = 11&
+50279>>>>>>>// Public Const SE_ERR_ACCESSDENIED = 5
+50279>>>>>>>// Public Const SE_ERR_ASSOCINCOMPLETE = 27
+50279>>>>>>>// Public Const SE_ERR_DDEBUSY = 30
+50279>>>>>>>// Public Const SE_ERR_DDEFAIL = 29
+50279>>>>>>>// Public Const SE_ERR_DDETIMEOUT = 28
+50279>>>>>>>// Public Const SE_ERR_DLLNOTFOUND = 32
+50279>>>>>>>// Public Const SE_ERR_FNF = 2
+50279>>>>>>>// Public Const SE_ERR_NOASSOC = 31
+50279>>>>>>>// Public Const SE_ERR_OOM = 8
+50279>>>>>>>// Public Const SE_ERR_PNF = 3
+50279>>>>>>>// Public Const SE_ERR_SHARE = 26
+50279>>>>>>>
+50279>>>>>>>
+50279>>>>>>>
+50279>>>>>>>// Code to open the program that is associated with the selected file.
+50279>>>>>>>//
+50279>>>>>>>// External function call used in Procedure DoStartDocument
+50279>>>>>>>External_Function vWin32_ShellExecute "ShellExecuteA" shell32.dll ;  Handle hWnd ;  Pointer lpOperation ;  Pointer lpFile ;  Pointer lpParameters ;  Pointer lpDirectory ;  DWord iShowCmd Returns Handle
+50280>>>>>>>
+50280>>>>>>>
+50280>>>>>>>// This will perform an operation on a file (e.g. open) with the application
+50280>>>>>>>// registered in the Windows Registry to open that type of file (via its extension)
+50280>>>>>>>// sOperation would be "OPEN" (it could also be "PRINT" etc).
+50280>>>>>>>Procedure vShellExecute Global String sOperation String sDocument String sParameters String sPath
+50282>>>>>>>    Send vShellExecuteBase sOperation sDocument sParameters sPath 1
+50283>>>>>>>End_Procedure
+50284>>>>>>>
+50284>>>>>>>Procedure vShellExecuteHide Global String sOperation String sDocument String sParameters String sPath
+50286>>>>>>>    Send vShellExecuteBase sOperation sDocument sParameters sPath 0
+50287>>>>>>>End_Procedure
+50288>>>>>>>
+50288>>>>>>>
+50288>>>>>>>Procedure vShellExecuteBase Global String sOperation String sDocument String sParameters String sPath Integer iHide
+50290>>>>>>>  Handle  hInstance hWnd
+50290>>>>>>>  Pointer lpsOperation
+50290>>>>>>>  Pointer lpsDocument
+50290>>>>>>>  Pointer lpsParameters
+50290>>>>>>>  Pointer lpsPath
+50290>>>>>>>  // remove any leading/trailing spaces in the string
+50290>>>>>>>  Move (Trim(sDocument)) to sDocument
+50291>>>>>>>  Move (Trim(sPath))     to sPath
+50292>>>>>>>  // Make the strings readable for windows API, by converting them to null-terminated
+50292>>>>>>>  Append sOperation   (Character(0))
+50293>>>>>>>  Append sDocument    (Character(0))
+50294>>>>>>>  Append sParameters  (Character(0))
+50295>>>>>>>  Append sPath        (Character(0))
+50296>>>>>>>  // Connect the corresponding pointers to the strings
+50296>>>>>>>  GetAddress of sOperation  to lpsOperation
+50297>>>>>>>  GetAddress of sDocument   to lpsDocument
+50298>>>>>>>  GetAddress of sParameters to lpsParameters
+50299>>>>>>>  GetAddress of sPath       to lpsPath
+50300>>>>>>>
+50300>>>>>>>  Get Window_Handle to hWnd
+50301>>>>>>>  Move (vWin32_ShellExecute (hWnd, lpsOperation, lpsDocument, lpsParameters, lpsPath, iHide)) to hInstance
+50302>>>>>>>  If (hInstance <= 32) Begin
+50304>>>>>>>    Send vDDE_Error_Handler hInstance
+50305>>>>>>>  End
+50305>>>>>>>>
+50305>>>>>>>End_Procedure // vShellExecute
+50306>>>>>>>
+50306>>>>>>>
+50306>>>>>>>
+50306>>>>>>>
+50306>>>>>>>                                          // Must be freed using SHFreeNameMappings
+50306>>>>>>>
+50306>>>>>>>Type vtShFileOpStruct
+50306>>>>>>>  Field vtShFileOpStruct.hWnd                   as Handle
+50306>>>>>>>  Field vtShFileOpStruct.wFunc                  as Integer
+50306>>>>>>>  Field vtShFileOpStruct.pFrom                  as Pointer
+50306>>>>>>>  Field vtShFileOpStruct.pTo                    as Pointer
+50306>>>>>>>  Field vtShFileOpStruct.fFlags                 as Short
+50306>>>>>>>  Field vtShFileOpStruct.fAnyOperationsAborted  as Short
+50306>>>>>>>  Field vtShFileOpStruct.hNameMappings          as Pointer
+50306>>>>>>>  Field vtShFileOpStruct.lpszProgressTitle      as Pointer // only used if FOF_SIMPLEPROGRESS
+50306>>>>>>>End_Type // tShFileOpStruct
+50306>>>>>>>
+50306>>>>>>>// hwnd
+50306>>>>>>>//   Handle of the dialog box to use to display information about the status of the operation.
+50306>>>>>>>
+50306>>>>>>>// wFunc
+50306>>>>>>>//   Operation to perform. This member can be one of the following values:
+50306>>>>>>>//     FO_COPY     Copies the files specified by pFrom to the location specified by pTo.
+50306>>>>>>>//     FO_DELETE   Deletes the files specified by pFrom (pTo is ignored).
+50306>>>>>>>//     FO_MOVE     Moves the files specified by pFrom to the location specified by pTo.
+50306>>>>>>>//     FO_RENAME   Renames the files specified by pFrom.
+50306>>>>>>>
+50306>>>>>>>// pFrom
+50306>>>>>>>//   Pointer to a buffer that specifies one or more source file names. Multiple names must
+50306>>>>>>>//   be null-separated. The list of names must be double null-terminated.
+50306>>>>>>>
+50306>>>>>>>// pTo
+50306>>>>>>>//   Pointer to a buffer that contains the name of the destination file or directory. The
+50306>>>>>>>//   buffer can contain mutiple destination file names if the fFlags member specifies
+50306>>>>>>>//   FOF_MULTIDESTFILES. Multiple names must be null-separated. The list of names must be
+50306>>>>>>>//   double null-terminated.
+50306>>>>>>>
+50306>>>>>>>// fAnyOperationsAborted
+50306>>>>>>>//   Value that receives TRUE if the user aborted any file operations before they
+50306>>>>>>>//   were completed or FALSE otherwise.
+50306>>>>>>>
+50306>>>>>>>
+50306>>>>>>>// Performs a copy, move, rename, or delete operation on a file system object.
+50306>>>>>>>// This can be a file or a folder.
+50306>>>>>>>// With thanks to Andrew S Kaplan
+50306>>>>>>>External_Function vWin32_SHFileOperation "SHFileOperationA" Shell32.dll ;        Pointer lpFileOp Returns Integer
+50307>>>>>>>
+50307>>>>>>>
+50307>>>>>>>
+50307>>>>>>>Function vDeleteFile Global String sFileName Returns Integer
+50309>>>>>>>  String   sShFileOp
+50309>>>>>>>  Pointer  lpShFileOp
+50309>>>>>>>  Pointer  lpsFileName
+50309>>>>>>>  Integer  iFlags
+50309>>>>>>>  Integer  iRetVal
+50309>>>>>>>  Integer  bUserAbort
+50309>>>>>>>
+50309>>>>>>>  ZeroType vtShFileOpStruct to sShFileOp
+50310>>>>>>>  Append sFileName (Character(0)) (Character(0))
+50312>>>>>>>  GetAddress of sFileName to lpsFileName
+50313>>>>>>>  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+50314>>>>>>>
+50314>>>>>>>  Put vFO_DELETE   to sShFileOp at vtShFileOpStruct.wFunc
+50315>>>>>>>  Put lpsFileName to sShFileOp at vtShFileOpStruct.pFrom
+50316>>>>>>>  Put iFlags      to sShFileOp at vtShFileOpStruct.fFlags
+50317>>>>>>>  GetAddress of sShFileOp to lpShFileOp
+50318>>>>>>>
+50318>>>>>>>  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+50319>>>>>>>  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+50320>>>>>>>  If (bUserAbort <> 0) Begin
+50322>>>>>>>    Move 80 to iRetVal //   Deletefile Operation Aborted by USER
+50323>>>>>>>  End
+50323>>>>>>>>
+50323>>>>>>>  Function_Return iRetVal
+50324>>>>>>>End_Function // vDeleteFile
+50325>>>>>>>
+50325>>>>>>>
+50325>>>>>>>Function vCopyFile Global String sSource String sDestination Returns Integer
+50327>>>>>>>  String   sShFileOp
+50327>>>>>>>  Pointer  lpShFileOp
+50327>>>>>>>  Pointer  lpsSource
+50327>>>>>>>  Pointer  lpsDestination
+50327>>>>>>>  Integer  iFlags
+50327>>>>>>>  Integer  iRetVal
+50327>>>>>>>  Integer  bUserAbort
+50327>>>>>>>
+50327>>>>>>>  ZeroType vtShFileOpStruct to sShFileOp
+50328>>>>>>>  Append sSource      (Character(0)) (Character(0))
+50330>>>>>>>  Append sDestination (Character(0)) (Character(0))
+50332>>>>>>>  GetAddress of sSource      to lpsSource
+50333>>>>>>>  GetAddress of sDestination to lpsDestination
+50334>>>>>>>  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+50335>>>>>>>
+50335>>>>>>>  Put vFO_COPY        to sShFileOp at vtShFileOpStruct.wFunc
+50336>>>>>>>  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+50337>>>>>>>  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+50338>>>>>>>  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+50339>>>>>>>
+50339>>>>>>>  GetAddress of sShFileOp to lpShFileOp
+50340>>>>>>>
+50340>>>>>>>  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+50341>>>>>>>  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+50342>>>>>>>  If (bUserAbort <> 0) Begin
+50344>>>>>>>    Move 80 to iRetVal  // Copyfile Operation Aborted by USER
+50345>>>>>>>  End
+50345>>>>>>>>
+50345>>>>>>>  Function_Return (iRetVal)
+50346>>>>>>>End_Function // vCopyFile
+50347>>>>>>>
+50347>>>>>>>
+50347>>>>>>>Function vMoveFile Global String sSource String sDestination Returns Integer
+50349>>>>>>>  String   sShFileOp
+50349>>>>>>>  Pointer  lpShFileOp
+50349>>>>>>>  Pointer  lpsSource
+50349>>>>>>>  Pointer  lpsDestination
+50349>>>>>>>  Integer  iFlags
+50349>>>>>>>  Integer  iRetVal
+50349>>>>>>>  Integer  bUserAbort
+50349>>>>>>>
+50349>>>>>>>  ZeroType vtShFileOpStruct to sShFileOp
+50350>>>>>>>  Append sSource      (Character(0)) (Character(0))
+50352>>>>>>>  Append sDestination (Character(0)) (Character(0))
+50354>>>>>>>  GetAddress of sSource      to lpsSource
+50355>>>>>>>  GetAddress of sDestination to lpsDestination
+50356>>>>>>>  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+50357>>>>>>>
+50357>>>>>>>  Put vFO_MOVE        to sShFileOp at vtShFileOpStruct.wFunc
+50358>>>>>>>  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+50359>>>>>>>  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+50360>>>>>>>  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+50361>>>>>>>
+50361>>>>>>>  GetAddress of sShFileOp to lpShFileOp
+50362>>>>>>>
+50362>>>>>>>  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+50363>>>>>>>  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+50364>>>>>>>  If (bUserAbort <> 0) Begin
+50366>>>>>>>    Move 80 to iRetVal // Movefile Operation Aborted by USER
+50367>>>>>>>  End
+50367>>>>>>>>
+50367>>>>>>>  Function_Return (iRetVal)
+50368>>>>>>>End_Function // vMoveFile
+50369>>>>>>>
+50369>>>>>>>// Rename a file or folder
+50369>>>>>>>// Returns a nonzero value if the operation failed.
+50369>>>>>>>Function vRenameFile Global String sSource String sDestination Returns Integer
+50371>>>>>>>  String   sShFileOp
+50371>>>>>>>  Pointer  lpShFileOp
+50371>>>>>>>  Pointer  lpsSource
+50371>>>>>>>  Pointer  lpsDestination
+50371>>>>>>>  Integer  iFlags
+50371>>>>>>>  Integer  iRetVal
+50371>>>>>>>  Integer  bUserAbort
+50371>>>>>>>
+50371>>>>>>>  ZeroType vtShFileOpStruct to sShFileOp
+50372>>>>>>>  Append sSource      (Character(0)) (Character(0))
+50374>>>>>>>  Append sDestination (Character(0)) (Character(0))
+50376>>>>>>>  GetAddress of sSource      to lpsSource
+50377>>>>>>>  GetAddress of sDestination to lpsDestination
+50378>>>>>>>  Move (vFOF_SILENT ior vFOF_NOCONFIRMATION ior vFOF_ALLOWUNDO) to iFlags
+50379>>>>>>>
+50379>>>>>>>  Put vFO_RENAME      to sShFileOp at vtShFileOpStruct.wFunc
+50380>>>>>>>  Put lpsSource      to sShFileOp at vtShFileOpStruct.pFrom
+50381>>>>>>>  Put lpsDestination to sShFileOp at vtShFileOpStruct.pTo
+50382>>>>>>>  Put iFlags         to sShFileOp at vtShFileOpStruct.fFlags
+50383>>>>>>>
+50383>>>>>>>  GetAddress of sShFileOp to lpShFileOp
+50384>>>>>>>
+50384>>>>>>>  Move (vWin32_SHFileOperation(lpShFileOp)) to iRetVal
+50385>>>>>>>  GetBuff from sShFileOp At vtShFileOpStruct.fAnyOperationsAborted to bUserAbort
+50386>>>>>>>  If (bUserAbort <> 0) Begin
+50388>>>>>>>    Move 80 to iRetVal // Renamefile Operation Aborted by USER
+50389>>>>>>>  End
+50389>>>>>>>>
+50389>>>>>>>  Function_Return (iRetVal)
+50390>>>>>>>End_Function // vRenameFile
+50391>>>>>>>
+50391>>>>>>>
+50391>>>>>>>// Thanks To Oliver Nelson for posting this code on the newsgroups
+50391>>>>>>>External_Function vWin32_GetWindowsDirectory "GetWindowsDirectoryA" kernel32.dll ;                           Pointer lpBuffer Integer nSize Returns Integer
+50392>>>>>>>
+50392>>>>>>>
+50392>>>>>>>Function vGetWindowsDirectory Returns String
+50395>>>>>>>  String  sDirectory
+50395>>>>>>>  Pointer lpDirectory
+50395>>>>>>>  Integer iVoid
+50395>>>>>>>
+50395>>>>>>>  ZeroString vMAX_PATH to sDirectory
+50396>>>>>>>  GetAddress of sDirectory to lpDirectory
+50397>>>>>>>
+50397>>>>>>>  Move (vWin32_GetWindowsDirectory(lpDirectory, vMAX_PATH)) to iVoid
+50398>>>>>>>  Function_Return (CString(sDirectory))  // **WvA: Changed to CString()
+50399>>>>>>>End_Function // vGetWindowsDirectory
+50400>>>>>>>
+50400>>>>>>>
+50400>>>>>>>
+50400>>>>>>>// Courtesy Of Vincent Oorsprong
+50400>>>>>>>//External_Function vWin32_GetTempFileName "GetTempFileNameA" Kernel32.Dll ;
+50400>>>>>>>//   Pointer lpPathName ;
+50400>>>>>>>//   Pointer lpPrefixString ;
+50400>>>>>>>//   Integer uUnique ;
+50400>>>>>>>//   Pointer lpTempFileName ;
+50400>>>>>>>//   Returns Integer
+50400>>>>>>>
+50400>>>>>>>External_Function vWin32_GetTempFileName "GetTempFileNameA" kernel32.dll String sPath ;        String sPrefix Integer iUnique Pointer pLoad Returns Integer
+50401>>>>>>>
+50401>>>>>>>External_Function vWin32_GetTempPath "GetTempPathA" Kernel32.Dll ;   DWord nBufferLength ;   Pointer lpBuffer ;   Returns Integer
+50402>>>>>>>
+50402>>>>>>>External_Function vWin32_DeleteFile "DeleteFileA" Kernel32.Dll ;   Pointer lpFileName ;   Returns Integer
+50403>>>>>>>
+50403>>>>>>>// Courtesy of Marco Kuipers
+50403>>>>>>>Function vMakeTempFile Returns String
+50406>>>>>>>    Integer iRetval
+50406>>>>>>>    String  sTempPath sTempFileName sPrefixString
+50406>>>>>>>    Pointer lpTempPath lpTempFileName lpPrefixString
+50406>>>>>>>
+50406>>>>>>>    Move (Repeat (Character (0), 255)) to sTempPath
+50407>>>>>>>    GetAddress of sTempPath to lpTempPath
+50408>>>>>>>    Move (vWin32_GetTempPath (255, lpTempPath)) to iRetVal
+50409>>>>>>>
+50409>>>>>>>    If (sTempPath = "") Begin
+50411>>>>>>>       Get_Current_Directory to sTempPath
+50412>>>>>>>    End
+50412>>>>>>>>
+50412>>>>>>>
+50412>>>>>>>    Move (Repeat (Character (0), 255)) to sTempFileName
+50413>>>>>>>    GetAddress of sTempFileName to lpTempFileName
+50414>>>>>>>    Move "tmp" to sPrefixString // TMP
+50415>>>>>>>    GetAddress of sPrefixString to lpPrefixString
+50416>>>>>>>    GetAddress of sTempPath to lpTempPath
+50417>>>>>>>    Move (vWin32_GetTempFileName (lpTempPath, lpPrefixString, 0, lpTempFileName)) to iRetval
+50418>>>>>>>    If (iRetval <> 0) Begin
+50420>>>>>>>        Move "" to sTempFileName
+50421>>>>>>>    End
+50421>>>>>>>>
+50421>>>>>>>
+50421>>>>>>>    Function_Return sTempFileName
+50422>>>>>>>End_Function // vMakeTempFile
+50423>>>>>>>
+50423>>>>>>>
+50423>>>>>>>Function vCreateTempFileInPath String Path String Prefix Returns String
+50426>>>>>>>    String TempFileName
+50426>>>>>>>    Integer iCnt iRetVal
+50426>>>>>>>    Pointer lpTempFileName
+50426>>>>>>>
+50426>>>>>>>    Move (pad("", vMAX_PATH)) to TempFileName
+50427>>>>>>>    GetAddress of TempFileName to lpTempFileName
+50428>>>>>>>
+50428>>>>>>>    Move (vWin32_GetTempFileName(Path, Prefix, 0, lpTempFileName)) to iRetVal
+50429>>>>>>>    Move (trim(TempFileName)) to TempFileName
+50430>>>>>>>    left TempFileName to TempFileName (Length(TempFileName)-1)
+50432>>>>>>>>
+50432>>>>>>>    Function_Return TempFileName
+50433>>>>>>>End_Function
+50434>>>>>>>
+50434>>>>>>>
+50434>>>>>>>Define vCSIDL_DESKTOP          for |CI$00
+50434>>>>>>>Define vCSIDL_PROGRAMS         for |CI$02
+50434>>>>>>>Define vCSIDL_CONTROLS         for |CI$03
+50434>>>>>>>Define vCSIDL_PRINTERS         for |CI$04
+50434>>>>>>>Define vCSIDL_PERSONAL         for |CI$05   // (Documents folder)
+50434>>>>>>>Define vCSIDL_FAVORITES        for |CI$06
+50434>>>>>>>Define vCSIDL_STARTUP          for |CI$07
+50434>>>>>>>Define vCSIDL_RECENT           for |CI$08   // (Recent folder)
+50434>>>>>>>Define vCSIDL_SENDTO           for |CI$09
+50434>>>>>>>Define vCSIDL_BITBUCKET        for |CI$0A
+50434>>>>>>>Define vCSIDL_STARTMENU        for |CI$0B
+50434>>>>>>>Define vCSIDL_DESKTOPDIRECTORY for |CI$10
+50434>>>>>>>Define vCSIDL_DRIVES           for |CI$11
+50434>>>>>>>Define vCSIDL_NETWORK          for |CI$12
+50434>>>>>>>Define vCSIDL_NETHOOD          for |CI$13
+50434>>>>>>>Define vCSIDL_FONTS            for |CI$14
+50434>>>>>>>Define vCSIDL_TEMPLATES        for |CI$15   // (ShellNew folder)
+50434>>>>>>>
+50434>>>>>>>
+50434>>>>>>>//HRESULT SHGetFolderPath(
+50434>>>>>>>//    HWND hwndOwner,
+50434>>>>>>>//    int nFolder,
+50434>>>>>>>//    HANDLE hToken,
+50434>>>>>>>//    DWORD dwFlags,
+50434>>>>>>>//    LPTSTR pszPath
+50434>>>>>>>//);
+50434>>>>>>>// This function is a superset of SHGetSpecialFolderPath, included with earlier versions of
+50434>>>>>>>// the shell. It is implemented in a redistributable DLL, SHFolder.dll, that also simulates
+50434>>>>>>>// many of the new shell folders on older platforms such as Windows 95, Windows 98, and
+50434>>>>>>>// Windows NT 4.0. This DLL always calls the current platform's version of this function.
+50434>>>>>>>// If that fails, it will try to simulate the appropriate behavior.
+50434>>>>>>>//
+50434>>>>>>>External_Function vWin32_SHGetFolderPath "SHGetFolderPathA" SHFolder.Dll ;   Pointer hWnd ;   Integer nFolder ;   Pointer hToken ;   DWord   dwFlags ;   Pointer lpszPath ;   Returns Integer
+50435>>>>>>>
+50435>>>>>>>Function vSHGetFolderPath Integer nFolder Returns String
+50438>>>>>>>  String  sFolder
+50438>>>>>>>  Integer iVoid
+50438>>>>>>>  Pointer lpsFolder
+50438>>>>>>>  Handle  hWnd
+50438>>>>>>>  Move (Window_Handle(focus(desktop))) to hWnd
+50439>>>>>>>
+50439>>>>>>>  Move (Repeat(character(0), vMAX_PATH)) to sFolder
+50440>>>>>>>  GetAddress of sFolder to lpsFolder
+50441>>>>>>>
+50441>>>>>>>  Move (vWin32_SHGetFolderPath(hWnd,nFolder, 0, 0,lpsFolder)) to iVoid
+50442>>>>>>>  Function_Return (CString(sFolder))
+50443>>>>>>>End_Function // vSHGetFolderPAth
+50444>>>>>>>
+50444>>>>>>>
+50444>>>>>>>
+50444>>>>>>>
+50444>>>>>>>Type vWin32_Find_Data
+50444>>>>>>>  Field vWin32_Find_Data.dwFileAttributes as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftCreationLowDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftCreationHighDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftLastAccessLowDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftLastAccessHighDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftLastWriteLowDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.ftLastWriteHighDateTime as DWord
+50444>>>>>>>  Field vWin32_Find_Data.nFileSizeHigh as DWord
+50444>>>>>>>  Field vWin32_Find_Data.nFileSizeLow as DWord
+50444>>>>>>>  Field vWin32_Find_Data.dwReserved0 as DWord
+50444>>>>>>>  Field vWin32_Find_Data.dwReserved1 as DWord
+50444>>>>>>>  Field vWin32_Find_Data.cFileName as Char vMax_Path
+50444>>>>>>>  Field vWin32_Find_Data.cAlternateFileName as Char 14
+50444>>>>>>>End_Type // vWin32_Find_Data
+50444>>>>>>>
+50444>>>>>>>// Courtesy Of Vincent Oorsprong
+50444>>>>>>>// lpFileName      : address of name of file to search for
+50444>>>>>>>// lpFindFileData  : address of returned information
+50444>>>>>>>External_Function vWin32_FindFirstFile "FindFirstFileA"  Kernel32.dll Pointer lpFileName ;          Pointer lpFindFileData Returns Handle
+50445>>>>>>>
+50445>>>>>>>// Courtesy Of Vincent Oorsprong
+50445>>>>>>>// hFindFile       : handle of search
+50445>>>>>>>// lpFindFileData  : address of structure for data on found file
+50445>>>>>>>External_Function vWin32_FindNextFile "FindNextFileA" Kernel32.dll Handle hFindFile ;          Pointer lpFindFileData Returns Integer
+50446>>>>>>>
+50446>>>>>>>// Courtesy Of Vincent Oorsprong
+50446>>>>>>>//  hFindFile      : file search handle
+50446>>>>>>>External_Function vWin32_FindClose "FindClose" Kernel32.dll Handle hFindFile Returns Integer
+50447>>>>>>>
+50447>>>>>>>
+50447>>>>>>>
+50447>>>>>>>Type vFileTime
+50447>>>>>>>  Field vFileTime.dwLowDateTime as DWord
+50447>>>>>>>  Field vFileTime.dwHighDateTime as DWord
+50447>>>>>>>End_Type // vFileTime
+50447>>>>>>>
+50447>>>>>>>
+50447>>>>>>>Type vSystemTime
+50447>>>>>>>  Field vSystemTime.wYear as Word
+50447>>>>>>>  Field vSystemTime.wMonth as Word
+50447>>>>>>>  Field vSystemTime.wDayOfWeek as Word
+50447>>>>>>>  Field vSystemTime.wDay as Word
+50447>>>>>>>  Field vSystemTime.wHour as Word
+50447>>>>>>>  Field vSystemTime.wMinute as Word
+50447>>>>>>>  Field vSystemTime.wSecond as Word
+50447>>>>>>>  Field vSystemTime.wMilliSeconds as Word
+50447>>>>>>>End_Type // vSystemTime
+50447>>>>>>>
+50447>>>>>>>
+50447>>>>>>>// Courtesy Of Vincent Oorsprong
+50447>>>>>>>//  lpFileTime     : pointer to file time to convert
+50447>>>>>>>//  lpSystemTime   : pointer to structure to receive system time
+50447>>>>>>>External_Function vWin32_FileTimeToSystemTime "FileTimeToSystemTime" Kernel32.Dll ;          Pointer lpFileTime Pointer lpsystemTime Returns Integer
+50448>>>>>>>
+50448>>>>>>>// Courtesy Of Vincent Oorsprong
+50448>>>>>>>// This function formats the time in a picture-string passed
+50448>>>>>>>//
+50448>>>>>>>// Picture      Meaning
+50448>>>>>>>//    h         Hours with no leading zero for single-digit hours; 12-hour clock
+50448>>>>>>>//    hh        Hours with leading zero for single-digit hours; 12-hour clock
+50448>>>>>>>//    H         Hours with no leading zero for single-digit hours; 24-hour clock
+50448>>>>>>>//    HH        Hours with leading zero for single-digit hours; 24-hour clock
+50448>>>>>>>//    m         Minutes with no leading zero for single-digit minutes
+50448>>>>>>>//    mm        Minutes with leading zero for single-digit minutes
+50448>>>>>>>//    s         Seconds with no leading zero for single-digit seconds
+50448>>>>>>>//    ss        Seconds with leading zero for single-digit seconds
+50448>>>>>>>//    t         One character time marker string, such as A or P
+50448>>>>>>>//    tt        Multicharacter time marker string, such as AM or PM
+50448>>>>>>>//
+50448>>>>>>>// For example, to get the time string  "11:29:40 PM"
+50448>>>>>>>//    use the following picture string: "hh" : "mm" : "ss tt"
+50448>>>>>>>
+50448>>>>>>>External_Function vWin32_GetTimeFormat "GetTimeFormatA" Kernel32.Dll ;  DWord LCID DWord dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpTimeStr ;  Integer cchTime Returns Integer
+50449>>>>>>>
+50449>>>>>>>
+50449>>>>>>>// Courtesy Of Vincent Oorsprong
+50449>>>>>>>// This function formats the date in a picture-string passed
+50449>>>>>>>//
+50449>>>>>>>// Picture      Meaning
+50449>>>>>>>//    d         Day of month as digits with no leading zero for single-digit days.
+50449>>>>>>>//    dd        Day of month as digits with leading zero for single-digit days.
+50449>>>>>>>//    ddd       Day of week as a three-letter abbreviation. The function uses the
+50449>>>>>>>//              LOCALE_SABBREVOAYMAME value associated with the specified locale.
+50449>>>>>>>//    dddd      Day of week as its full name. The function uses the LOCALE_SDAYNAME
+50449>>>>>>>//              value associated with the specified locale.
+50449>>>>>>>//    M         Month as digits with no leading zero for single-digit months.
+50449>>>>>>>//    MM        Month as digits with leading zero for single-digit months.
+50449>>>>>>>//    MMM       Month as a three-letter abbreviation. The function uses the
+50449>>>>>>>//              LOCALE_SABBREVMONTHNAME value associated with the specified locale.
+50449>>>>>>>//    MMMM      Month as its full name. The function uses the LOCALE_SMONTHNAME value
+50449>>>>>>>//              associated with the specified locale.
+50449>>>>>>>//    y         Year as last two digits, but with no leading zero for years less than 10.
+50449>>>>>>>//    yy        Year as last two digits, but with leading zero for years less than 10.
+50449>>>>>>>//    yyyy      Year represented hy full four digits.
+50449>>>>>>>//    gg        Period/era string. The function uses the CAL_SERASTRING value associated
+50449>>>>>>>//              with the specified locale. This element is ignored if the date to be formatted
+50449>>>>>>>//              does not have an associated era or period string.
+50449>>>>>>>// For example, to get the date string  "Wed, Aug 31 94"
+50449>>>>>>>// use the following picture string:    "ddd","MMM dd yy"
+50449>>>>>>>
+50449>>>>>>>External_Function vWin32_GetDateFormat "GetDateFormatA" Kernel32.Dll ;  DWord LCID DWord dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpDateStr ;  Integer cchDate Returns Integer
+50450>>>>>>>
+50450>>>>>>>Define LOCALE_NOUSEROVERRIDE    for |CI$80000000  //  do not use user overrides
+50450>>>>>>>Define TIME_NOMIHUTESORSECONDS  for |CI$0000000l  //  do not use minutes or seconds
+50450>>>>>>>Define TIME_NOSECONDS           for |CI$00000002  //  do not use seconds
+50450>>>>>>>Define TIME_NOTIMEMARKER        for |CI$00000004  //  do not use time marker
+50450>>>>>>>Define TIME_FORCE24HOURFORMAT   for |CI$00000008  //  always use 24 hour format
+50450>>>>>>>
+50450>>>>>>>//  Date Flags for GetDateFormatW.
+50450>>>>>>>//
+50450>>>>>>>Define DATE_SHORTDATE           for |CI$0000000l  //  use short date picture
+50450>>>>>>>Define DATE_LONGDATE            for |CI$00000002  //  use long date picture
+50450>>>>>>>Define DATE_USE_ALT_CALENDAR    for |CI$00000004  //  use alternate calendar (if any)
+50450>>>>>>>
+50450>>>>>>>
+50450>>>>>>>// Courtesy Of Vincent Oorsprong
+50450>>>>>>>Function vConvertFileDateTime Global DWord dwLowDateTime DWord dwHighDateTime Returns String
+50452>>>>>>>  String  sftTime sSystemTime sFormattedTime sFormattedDate
+50452>>>>>>>  Pointer lpsftTime lpsSystemTime lpsFormattedTime lpsFormattedDate
+50452>>>>>>>  Integer iSuccess iLenCcTime iDataLength iLenCcDate
+50452>>>>>>>
+50452>>>>>>>  ZeroType vFileTime  to sftTime
+50453>>>>>>>  Put dwLowDateTime  to sftTime At vFileTime.dwLowDateTime
+50454>>>>>>>  Put dwHighDateTime to sftTime At vFileTime.dwHighDateTime
+50455>>>>>>>  GetAddress of sftTime to lpsftTime
+50456>>>>>>>
+50456>>>>>>>  ZeroType vSystemTime to sSystemTime
+50457>>>>>>>  GetAddress of sSystemTime to lpsSystemTime
+50458>>>>>>>
+50458>>>>>>>  Moveint (vWin32_FileTimeToSystemTime (lpsftTime, lpsSystemTime)) to iSuccess
+50459>>>>>>>>
+50459>>>>>>>  If iSuccess Eq DfTrue Begin
+50461>>>>>>>    ZeroString 255 to sFormattedTime
+50462>>>>>>>    GetAddress of sFormattedTime to lpsFormattedTime
+50463>>>>>>>    Length sFormattedTime to iLenCcTime
+50464>>>>>>>>
+50464>>>>>>>    Moveint (vWin32_GetTimeFormat (LOCALE_USER_DEFAULT, 0, lpsSystemTime, 0, ;                             lpsFormattedTime, iLenCcTime)) to iDataLength
+50465>>>>>>>>
+50465>>>>>>>    ZeroString 255 to sFormattedDate
+50466>>>>>>>    GetAddress of sFormattedDate to lpsFormattedDate
+50467>>>>>>>    Length sFormattedDate to iLenCcDate
+50468>>>>>>>>
+50468>>>>>>>    Moveint (vWin32_GetDateFormat (LOCALE_USER_DEFAULT, 0, lpsSystemTime, 0, ;                             lpsFormattedDate, iLenCcDate)) to iDataLength
+50469>>>>>>>>
+50469>>>>>>>    Function_Return (Cstring (sFormattedDate)  * Cstring (sFormattedTime))
+50470>>>>>>>  End // iSuccess
+50470>>>>>>>>
+50470>>>>>>>End_Function // vConvertFileDateTime
+50471>>>>>>>
+50471>>>>>>>
+50471>>>>>>>
+50471>>>>>>>External_Function vWin32_SetLastError "SetLastError" Kernel32.Dll DWord dwLastError Returns Integer
+50472>>>>>>>
+50472>>>>>>>// **WvA:
+50472>>>>>>>// A windows replacement for the standard function FileExists.
+50472>>>>>>>// This version will also return (true) for a file when it is open by an application.
+50472>>>>>>>// Note that you can apply normal windows mask-signs in the filename such as * and ?
+50472>>>>>>>// Example: Get vFilePathExists "C:\config.sy?"
+50472>>>>>>>// This will return true if you have a file matching these conditions. (aka config.sys)
+50472>>>>>>>Function vFilePathExists Global String sFilePathMask Returns Integer
+50474>>>>>>>  String  sWin32FindData
+50474>>>>>>>  String  sLongFileName
+50474>>>>>>>  Pointer lpsFilePathMask lpsWin32FindData
+50474>>>>>>>  Handle  hFindFile
+50474>>>>>>>  Integer iVoid iRetval bFound
+50474>>>>>>>
+50474>>>>>>>  GetAddress of sFilePathMask to lpsFilePathMask
+50475>>>>>>>  Zerotype vWin32_Find_Data to sWin32FindData
+50476>>>>>>>  GetAddress of sWin32FindData to lpswin32FindData
+50477>>>>>>>  Move (vWin32_FindFirstFile (lpsFilePathMask, lpsWin32FindData)) to hFindFile
+50478>>>>>>>  Move (vWin32_FindClose (hFindFile)) to iVoid
+50479>>>>>>>  Function_Return (hFindFile <> vINVALID_HANDLE_VALUE)
+50480>>>>>>>End_Function // vFilePathExists
+50481>>>>>>>
+50481>>>>>>>// **WvA
+50481>>>>>>>// Formats a foldername by first trimming it and after that by sticking a
+50481>>>>>>>// directory separator (/\) to the end if it doesn't have one there already.
+50481>>>>>>>// The folder may contain a drive letter or UNC encoding.
+50481>>>>>>>Function vFolderFormat Global String sFolderName Returns String
+50483>>>>>>>  String sDirSep
+50483>>>>>>>  Move (sysconf(SYSCONF_DIR_SEPARATOR)) to sDirSep  // normally \ (backslash)
+50484>>>>>>>  Move (Trim(sFolderName)) to sFolderName
+50485>>>>>>>  If (Right(sFolderName,1)<>sDirSep) Begin
+50487>>>>>>>    Move (sFolderName+sDirSep) to sFolderName
+50488>>>>>>>  End
+50488>>>>>>>>
+50488>>>>>>>  Function_Return sFolderName
+50489>>>>>>>End_Function // vFolderFormat
+50490>>>>>Use Flexml.pkg
+Including file: Flexml.pkg    (C:\Program Files (x86)\Visual DataFlex 14.1\Pkg\Flexml.pkg)
+50490>>>>>>>//****************************************************************************************
+50490>>>>>>>//                                                                                       *
+50490>>>>>>>//  FLEXML.PKG                                                                            *
+50490>>>>>>>//                                                                                       *
+50490>>>>>>>//  Interface package for FLEXML.DLL - extension system for Extensible Markup Language.  *
+50490>>>>>>>//                                                                                       *
+50490>>>>>>>//  Written by Michael Gouker, 7/31/99                                                   *
+50490>>>>>>>// 12/19/2000 JJT - Major revision changes for VDF7/SP2.                                 *
+50490>>>>>>>//                                                                                       *
+50490>>>>>>>//****************************************************************************************
+50490>>>>>>>Use LanguageText.pkg
+50490>>>>>>>Use Windows.pkg
+50490>>>>>>>Use GlobalFunctionsProcedures.pkg
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>// Used to designate that a handle is a handle to an Xml Dom object. This
+50490>>>>>>>// is used/required by server web-services but could be used elsewhere .
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>// Types of Nodes
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>// classes and methods defined in fmac
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>register_function transformNode integer infcXSLNode returns string
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>// XML function & procedure registration
+50490>>>>>>>
+50490>>>>>>>register_procedure set XmlInterface integer iHandle
+50490>>>>>>>register_function XmlInterface returns integer
+50490>>>>>>>
+50490>>>>>>>// NODE Properties
+50490>>>>>>>register_function phAttributes returns integer
+50490>>>>>>>register_function psBaseName returns String
+50490>>>>>>>register_function phChildNodes returns integer
+50490>>>>>>>register_function phDefinition returns integer
+50490>>>>>>>register_function phFirstChild returns integer
+50490>>>>>>>register_function phLastChild returns integer
+50490>>>>>>>register_function phNextSibling returns integer
+50490>>>>>>>register_function psNameSpaceURI returns String
+50490>>>>>>>register_function psNodeName returns String
+50490>>>>>>>register_function piNodeType returns integer
+50490>>>>>>>register_function psNodeTypeString returns string
+50490>>>>>>>register_function phOwnerDocument returns integer
+50490>>>>>>>register_function phParentNode returns integer
+50490>>>>>>>register_function pbParsed returns integer
+50490>>>>>>>register_function psPrefix returns string
+50490>>>>>>>register_function phPreviousSibling returns integer
+50490>>>>>>>register_function pbSpecified returns integer
+50490>>>>>>>register_function psText returns string
+50490>>>>>>>register_procedure set psText string sText
+50490>>>>>>>register_function psXML returns string
+50490>>>>>>>
+50490>>>>>>>// Node Read write properties
+50490>>>>>>>
+50490>>>>>>>register_procedure set psDataType string sTypeName
+50490>>>>>>>register_function psDataType returns String
+50490>>>>>>>register_procedure set pvNodeTypedValue integer iType integer iAddress
+50490>>>>>>>register_function pvNodeTypedValue integer iType returns integer  // address of data
+50490>>>>>>>register_procedure set psNodeValue string sValue
+50490>>>>>>>register_function psNodeValue returns string
+50490>>>>>>>
+50490>>>>>>>// Node Methods
+50490>>>>>>>
+50490>>>>>>>register_function AppendChild integer iChildInfc returns integer
+50490>>>>>>>register_function CloneInfcNode integer bRecurse returns integer
+50490>>>>>>>register_function HasChildNodes returns integer
+50490>>>>>>>register_function InsertBefore integer infcNodeToInsert Integer iWhere returns Integer
+50490>>>>>>>register_function RemoveChild integer iChildToRemove returns integer
+50490>>>>>>>register_function ReplaceChild integer iNewChild integer iChildToReplace returns integer
+50490>>>>>>>register_function SelectNodes string selectstring returns integer
+50490>>>>>>>register_function SelectSingleNode string selectstring returns integer
+50490>>>>>>>
+50490>>>>>>>// Node Collections
+50490>>>>>>>// READONLY PROPERTIES
+50490>>>>>>>
+50490>>>>>>>register_function phItem integer iItem returns integer
+50490>>>>>>>register_function phElementItem integer iItem returns integer
+50490>>>>>>>
+50490>>>>>>>register_function piLength returns integer
+50490>>>>>>>
+50490>>>>>>>//*     GET_ENUMNODELIST                  */  typ_p1_int | qt_int | out_two,
+50490>>>>>>>//*     GET_RESET                         */  qt_int | out_one,
+50490>>>>>>>
+50490>>>>>>>// Named Node Map
+50490>>>>>>>
+50490>>>>>>>//*     GET_NAMEDITEM                     */  typ_p1_str | qt_int | out_two,
+50490>>>>>>>
+50490>>>>>>>register_function NamedItem string sName returns integer
+50490>>>>>>>register_function QualifiedItem string sBaseName string sNameSpace returns integer
+50490>>>>>>>register_function RemoveNamedItem string sName returns integer
+50490>>>>>>>register_function RemoveQualifiedItem string sBaseName string sNameSpace returns integer
+50490>>>>>>>register_function SetNamedItem integer iInterface returns integer
+50490>>>>>>>
+50490>>>>>>>// XML DOM Document
+50490>>>>>>>// Read only properties
+50490>>>>>>>
+50490>>>>>>>register_function phDocType returns integer
+50490>>>>>>>register_function phImplementation returns integer
+50490>>>>>>>register_function phParseError returns integer
+50490>>>>>>>register_function piReadyState returns integer
+50490>>>>>>>register_function psURL returns string
+50490>>>>>>>
+50490>>>>>>>// Read Write Properties
+50490>>>>>>>
+50490>>>>>>>register_procedure set pbAsync integer bValue
+50490>>>>>>>register_function pbAsync returns integer
+50490>>>>>>>register_procedure set phDocumentElement integer iElement
+50490>>>>>>>register_function phDocumentElement returns Integer
+50490>>>>>>>register_procedure set pbPreserveWhiteSpace integer bValue
+50490>>>>>>>register_function pbPreserveWhiteSpace returns integer
+50490>>>>>>>register_procedure set pbResolveExternals integer bValue
+50490>>>>>>>register_function pbResolveExternals returns integer
+50490>>>>>>>register_procedure set pbValidateOnParse integer bValue
+50490>>>>>>>register_function pbValidateOnParse returns integer
+50490>>>>>>>
+50490>>>>>>>// Events
+50490>>>>>>>
+50490>>>>>>>// Methods
+50490>>>>>>>
+50490>>>>>>>register_function abort returns integer
+50490>>>>>>>register_function ElementsByTagName string sTagName returns integer
+50490>>>>>>>register_function LoadDocument string sURLName returns integer
+50490>>>>>>>register_function LoadXML string sXMLText returns integer
+50490>>>>>>>register_function NodeFromID string sNodeName returns integer
+50490>>>>>>>register_function SaveDocument string sURLName returns integer
+50490>>>>>>>
+50490>>>>>>>// Parse Error
+50490>>>>>>>// Read Only Properties
+50490>>>>>>>
+50490>>>>>>>register_function piErrorCode returns integer
+50490>>>>>>>register_function piFilePos returns integer
+50490>>>>>>>register_function piLine returns integer
+50490>>>>>>>register_function piLinePos returns integer
+50490>>>>>>>register_function psReason returns string
+50490>>>>>>>register_function psSrcText returns string
+50490>>>>>>>register_function psURL returns string
+50490>>>>>>>
+50490>>>>>>>// DOM Implementation
+50490>>>>>>>// Method
+50490>>>>>>>
+50490>>>>>>>register_function HasFeature string sSystem string sFeature returns integer
+50490>>>>>>>
+50490>>>>>>>// Methods
+50490>>>>>>>
+50490>>>>>>>register_function substringData integer iOffset integer iCount returns String
+50490>>>>>>>register_function appendData string sData returns integer
+50490>>>>>>>register_function insertData integer iOffset string sData returns integer
+50490>>>>>>>register_function deleteData integer iOffset integer iCount returns integer
+50490>>>>>>>register_function replaceData integer iOffset integer iCount string sData returns Integer
+50490>>>>>>>
+50490>>>>>>>// Attributes
+50490>>>>>>>
+50490>>>>>>>register_function psName returns String
+50490>>>>>>>
+50490>>>>>>>// Elements
+50490>>>>>>>// Read Only properties
+50490>>>>>>>
+50490>>>>>>>register_function psTagName returns String
+50490>>>>>>>
+50490>>>>>>>// Methods
+50490>>>>>>>
+50490>>>>>>>register_procedure set attributeValue string sName string sValue
+50490>>>>>>>register_function attributeValue string sName returns string
+50490>>>>>>>register_function removeAttribute string sName returns integer
+50490>>>>>>>register_function attributeNode string sName returns integer
+50490>>>>>>>register_procedure set attributeNode integer iNode returns integer
+50490>>>>>>>register_function removeAttributeNode integer iNode returns integer
+50490>>>>>>>
+50490>>>>>>>// DOM Text
+50490>>>>>>>// Methods
+50490>>>>>>>
+50490>>>>>>>register_function splitText integer iOffset returns integer
+50490>>>>>>>
+50490>>>>>>>// DOM Processing Instruction
+50490>>>>>>>// Read Only Properties
+50490>>>>>>>register_function psTarget returns String
+50490>>>>>>>
+50490>>>>>>>// DOM Document Type
+50490>>>>>>>
+50490>>>>>>>register_function phEntities returns integer
+50490>>>>>>>register_function phNotations returns integer
+50490>>>>>>>
+50490>>>>>>>// DOM Notations
+50490>>>>>>>
+50490>>>>>>>register_function psPublicID returns string
+50490>>>>>>>register_function psSystemID returns string
+50490>>>>>>>register_function psNotationName returns string
+50490>>>>>>>
+50490>>>>>>>// create nodes
+50490>>>>>>>
+50490>>>>>>>register_function createAttribute string sName returns integer
+50490>>>>>>>register_function createCDataSection string sValue returns integer
+50490>>>>>>>register_function createComment string sValue returns integer
+50490>>>>>>>register_function createDocumentFragment returns integer
+50490>>>>>>>register_function createElement string sTagName returns integer
+50490>>>>>>>register_function createEntityReference string sEntityName returns integer
+50490>>>>>>>register_function createNode integer iNodeType string sName string sNameSpace returns integer
+50490>>>>>>>register_function createProcessingInstruction string sTarget string sData returns Integer
+50490>>>>>>>register_function createTextNode string sData returns integer
+50490>>>>>>>
+50490>>>>>>>register_function ChangeNodeType integer iTypeOfNode integer bSetInterface returns integer
+50490>>>>>>>
+50490>>>>>>>
+50490>>>>>>>// ******************************************************************************
+50490>>>>>>>//
+50490>>>>>>>//          Part 1:  Base Document Logic Specialized For Templates
+50490>>>>>>>//
+50490>>>>>>>// ******************************************************************************
+50490>>>>>>>
+50490>>>>>>>//
+50490>>>>>>>//  XML Collections
+50490>>>>>>>//
+50490>>>>>>>//  Collection mixin has common functions to both node lists and named node maps
+50490>>>>>>>//
+50490>>>>>>>
+50490>>>>>>>// This provides functions required of all XMLDOM objects.
+50490>>>>>>>//
+50490>>>>>>>Class cXMLDOMMixin is a Mixin
+50491>>>>>>>
+50491>>>>>>>    // Create an XML object of passed class Id and bind passed interface. returns
+50491>>>>>>>    // the object handle. All dynamic XML object can be created using this syntax
+50491>>>>>>>
+50491>>>>>>>    Function CreateXMLObject integer iClassId integer hinfXMLInterface returns Handle
+50493>>>>>>>        Handle hoId hoDocument
+50493>>>>>>>        // We will always create objects at the DOMDocument level.
+50493>>>>>>>        Get DocumentObject to hoDocument
+50494>>>>>>>        If (hoDocument=0) Begin  // this should never happen.
+50496>>>>>>>            error DFERR_XML_INTERNAL_ERROR C_$XmlFailedNoDocObject
+50497>>>>>>>>
+50497>>>>>>>            Function_return 0
+50498>>>>>>>        End
+50498>>>>>>>>
+50498>>>>>>>        If hinfXMLInterface Begin
+50500>>>>>>>            Get Create of hoDocument iClassId to hoID
+50501>>>>>>>            Set XMLInterface of hoID to hinfXMLInterface
+50502>>>>>>>        End
+50502>>>>>>>>
+50502>>>>>>>        Function_return hoID
+50503>>>>>>>    End_function
+50504>>>>>>>
+50504>>>>>>>    // create an XML Node object based on the interface type.
+50504>>>>>>>    // this will convert the interface to the proper type and will create
+50504>>>>>>>    // an appropriate DF object.
+50504>>>>>>>    // This requires that a DocumentObject exists
+50504>>>>>>>
+50504>>>>>>>    Function CreateXMLNode handle hinfc returns handle
+50506>>>>>>>        integer hoNode iType iClassId
+50506>>>>>>>        Handle  hoDocument
+50506>>>>>>>        // Get the node type of the infc handle w/o creating a DF object
+50506>>>>>>>        Move (invokexml(DF_IXMLDOMNODE, GET_piNodeType, hinfc, 0, 0, 0, 0)) to iType
+50507>>>>>>>        Move (invokexml(DF_IXMLDOMNODE, GET_ChangeNodeType, hinfc, iType, 1, 0, 0)) to hInfc
+50508>>>>>>>        if (hinfc=0) Begin
+50510>>>>>>>            // this should not happen and we would need to know about this.
+50510>>>>>>>            Error DFERR_XML_INTERNAL_ERROR (C_$XmlFailedNoDocObject + string(iType))
+50511>>>>>>>>
+50511>>>>>>>            function_return 0
+50512>>>>>>>        end
+50512>>>>>>>>
+50512>>>>>>>        Get DocumentObject to hoDocument
+50513>>>>>>>        // you can augment your class IDs in a single place.
+50513>>>>>>>        Get NodeClassId of hoDocument iType to iClassId
+50514>>>>>>>        // MG: 12/6/00 Changed to create nodes inside of the document object.
+50514>>>>>>>        Get CreateXMLObject of hoDocument iClassId hinfc to hoNode
+50515>>>>>>>
+50515>>>>>>>        Function_return hoNode
+50516>>>>>>>    End_function
+50517>>>>>>>
+50517>>>>>>>    // Change object's class. This let's you change the class id of an object
+50517>>>>>>>    // on an object by object basis. This would let you create nodes (e.g. elements)
+50517>>>>>>>    // that have a custom interface for each node type. Normally, this would be sent
+50517>>>>>>>    // after a node has been created using one of the default classes
+50517>>>>>>>    Function ChangeNodeClass integer hoNode integer iClassID returns handle
+50519>>>>>>>        integer iType
+50519>>>>>>>        Handle  hinfcNew
+50519>>>>>>>        Get piNodeType of hoNode to iType
+50520>>>>>>>        Get ChangeNodeType of hoNode iType False to hInfcNew
+50521>>>>>>>        Send Destroy to hoNode // destroy object and old infc handle.
+50522>>>>>>>        Get CreateXMLObject iClassId hinfcNew to hoNode
+50523>>>>>>>        Function_return hoNode
+50524>>>>>>>    End_function
+50525>>>>>>>
+50525>>>>>>>End_Class
+50526>>>>>>>
+50526>>>>>>>
+50526>>>>>>>Class cXMLDOMCollectionMixin Is A Mixin
+50527>>>>>>>
+50527>>>>>>>    Import_Class_Protocol cXMLDOMMixin
+50528>>>>>>>
+50528>>>>>>>    //  Returns number of items in the collection
+50528>>>>>>>    //
+50528>>>>>>>    Function NodeListLength Returns Integer
+50530>>>>>>>        Integer iLength
+50530>>>>>>>        Get piLength To iLength
+50531>>>>>>>        Function_Return iLength
+50532>>>>>>>    End_Function
+50533>>>>>>>
+50533>>>>>>>    // Returns an XML node object for pass item
+50533>>>>>>>    //
+50533>>>>>>>    Function CollectionNode Integer I Returns Handle
+50535>>>>>>>        Integer hoNewNode
+50535>>>>>>>        Integer infcItem
+50535>>>>>>>        Get phItem i To infcItem
+50536>>>>>>>        If (infcItem) ;            Get CreateXMLNode infcItem to hoNewNode
+50539>>>>>>>        Function_Return hoNewNode
+50540>>>>>>>    End_Function
+50541>>>>>>>
+50541>>>>>>>
+50541>>>>>>>End_Class
+50542>>>>>>>
+50542>>>>>>>// Simple declarations of collections.
+50542>>>>>>>
+50542>>>>>>>Class cXMLDOMNodeList Is A BaseXmlDomNodeList
+50543>>>>>>>    Import_Class_Protocol cXMLDOMCollectionMixin
+50544>>>>>>>End_Class
+50545>>>>>>>
+50545>>>>>>>Class cXMLDOMNamedNodeMap Is A BaseXmlDomNamedNodeMap
+50546>>>>>>>
+50546>>>>>>>    Import_Class_Protocol cXMLDOMCollectionMixin
+50547>>>>>>>
+50547>>>>>>>    // returns a node attribute that matches passed name, zero if none
+50547>>>>>>>    Function NamedNode string sName Returns Handle
+50549>>>>>>>        Integer hoNewNode
+50549>>>>>>>        Integer infcItem
+50549>>>>>>>        Get NamedItem sName To infcItem
+50550>>>>>>>        If infcItem ;            Get CreateXMLNode infcItem to hoNewNode
+50553>>>>>>>        Function_Return hoNewNode
+50554>>>>>>>    End_Function
+50555>>>>>>>
+50555>>>>>>>    // Adds or changes a node attribute
+50555>>>>>>>    // This should return the passed object Id which is now bound to the attribute. If an error, returns 0
+50555>>>>>>>    Function SetNamedNode Handle hoNode Returns Handle
+50557>>>>>>>        Integer hinfcNode hinfcItem
+50557>>>>>>>        Get XMLInterface of hoNode to hinfcNode // node of passed attribute
+50558>>>>>>>        Get SetNamedItem hinfcNode To hinfcItem
+50559>>>>>>>        If hinfcItem ;            Set XMLInterface of hoNode to hinfcItem
+50562>>>>>>>        else ;            Move 0 to hoNode // zero indicates error
+50564>>>>>>>        Function_Return hoNode
+50565>>>>>>>    End_Function
+50566>>>>>>>
+50566>>>>>>>    // removes named attribute, Returns handle of removed node or zero if not found.
+50566>>>>>>>    // Note that returned object must be disposed of or moved somewhere else.
+50566>>>>>>>    Function RemoveNamedNode string sName Returns Handle
+50568>>>>>>>        Integer hoNewNode
+50568>>>>>>>        Integer infcItem
+50568>>>>>>>        Get RemoveNamedItem sName To infcItem
+50569>>>>>>>        If infcItem ;            Get CreateXMLNode infcItem to hoNewNode
+50572>>>>>>>        Function_Return hoNewNode
+50573>>>>>>>    End_Function
+50574>>>>>>>
+50574>>>>>>>    //(new)
+50574>>>>>>>    function QualifiedNode string sNameSpace string sBaseName returns handle
+50576>>>>>>>        Integer hoNewNode
+50576>>>>>>>        Integer infcItem
+50576>>>>>>>        Get QualifiedItem  sBaseName sNameSpace  To infcItem
+50577>>>>>>>        If infcItem ;            Get CreateXMLNode infcItem to hoNewNode
+50580>>>>>>>        Function_Return hoNewNode
+50581>>>>>>>    End_function
+50582>>>>>>>
+50582>>>>>>>    //(new)
+50582>>>>>>>    function RemoveQualifiedNode string sNameSpace string sBaseName returns handle
+50584>>>>>>>        Integer hoNewNode
+50584>>>>>>>        Integer infcItem
+50584>>>>>>>        Get RemoveQualifiedItem sBaseName sNameSpace To infcItem
+50585>>>>>>>        If infcItem ;            Get CreateXMLNode infcItem to hoNewNode
+50588>>>>>>>        Function_Return hoNewNode
+50589>>>>>>>    End_Function
+50590>>>>>>>
+50590>>>>>>>End_Class
+50591>>>>>>>
+50591>>>>>>>
+50591>>>>>>>
+50591>>>>>>>// Mixin for nodes.
+50591>>>>>>>//
+50591>>>>>>>//  First the declaration of functions that have no object references.
+50591>>>>>>>//
+50591>>>>>>>
+50591>>>>>>>
+50591>>>>>>>Class cXMLDOMNodeMixin Is A Mixin
+50592>>>>>>>
+50592>>>>>>>    Import_Class_Protocol cXMLDOMMixin
+50593>>>>>>>
+50593>>>>>>>    //  Append Node to the end of list. Returns passed Object handle if Ok, 0 if error
+50593>>>>>>>
+50593>>>>>>>    Function AppendNode handle hoNode Returns Handle
+50595>>>>>>>        Integer hoNewTextNode
+50595>>>>>>>        Integer hinfcNode
+50595>>>>>>>        Integer infcReturned
+50595>>>>>>>        // Get COM Interface to call Append child.
+50595>>>>>>>        Get XMLInterface Of hoNode To hinfcNode
+50596>>>>>>>        If (hinfcNode=0) Function_return 0
+50599>>>>>>>        Get AppendChild hinfcNode To infcReturned
+50600>>>>>>>        // Interface returned is stored in DataFlex object.
+50600>>>>>>>        If (infcReturned=0) Function_return 0
+50603>>>>>>>        Set XMLInterface Of hoNode To infcReturned
+50604>>>>>>>        Function_Return hoNode
+50605>>>>>>>    End_Function
+50606>>>>>>>
+50606>>>>>>>    //  Insert NewNode before Node. Returns passed newnode Object handle if Ok, 0 if error
+50606>>>>>>>
+50606>>>>>>>    Function InsertBeforeNode Integer hoNewNode Integer hoNode Returns Handle
+50608>>>>>>>        Integer hinfcNewNode hinfcNode iType hoRefNode
+50608>>>>>>>        Integer infcReturned
+50608>>>>>>>        // DOM says if no refnode argument passed or it is 0, append to end
+50608>>>>>>>        If (Num_Arguments=1) ;            Move 0 to hoRefNode
+50611>>>>>>>        else ;            Move hoNode to hoRefNode
+50613>>>>>>>        Get XMLInterface Of hoNewNode To hinfcNewNode
+50614>>>>>>>        If (hinfcNewNode=0) Function_return 0
+50617>>>>>>>        if hoRefNode begin
+50619>>>>>>>            Get XMLInterface Of hoRefNode To hinfcNode
+50620>>>>>>>            If (hinfcNode=0) function_return 0
+50623>>>>>>>        End
+50623>>>>>>>>
+50623>>>>>>>        Get InsertBefore hinfcNewNode hinfcNode To infcReturned
+50624>>>>>>>        If (infcReturned=0) Function_return 0
+50627>>>>>>>        // Interface returned is stored in DataFlex object.
+50627>>>>>>>        Set XMLInterface Of hoNewNode To infcReturned
+50628>>>>>>>        Function_Return hoNewNode
+50629>>>>>>>    End_Function
+50630>>>>>>>
+50630>>>>>>>    //  Remove Node. Returns object Id of removed node, zero if error
+50630>>>>>>>    //  Important: The node is not destroyed! This lets you move it elsewhere if you want
+50630>>>>>>>
+50630>>>>>>>    Function RemoveNode integer hoNode Returns Handle
+50632>>>>>>>        Integer hInfcNode
+50632>>>>>>>        Get XMLInterface of hoNode to hInfcNode
+50633>>>>>>>        If (hinfcNode=0) Function_return 0
+50636>>>>>>>        Get RemoveChild hInfcNode To hinfcNode
+50637>>>>>>>        If (hinfcNode=0) Function_return 0
+50640>>>>>>>        Set XMLInterface of hoNode to hinfcNode
+50641>>>>>>>        Function_Return hoNode
+50642>>>>>>>    End_Function
+50643>>>>>>>
+50643>>>>>>>    //  Replace Node. Returns object Id of replaced node, zero if error
+50643>>>>>>>    //  Important: The replaced node is not destroyed! This lets you move it elsewhere if you want
+50643>>>>>>>
+50643>>>>>>>    Function ReplaceNode integer hoNewNode integer hoNodeToReplace Returns Handle
+50645>>>>>>>        Integer hInfcNewNode hinfcNodetoReplace hinfcNode
+50645>>>>>>>        Get XMLInterface of hoNewNode       to hInfcNewNode
+50646>>>>>>>        Get XMLInterface of hoNodetoReplace to hInfcNodetoreplace
+50647>>>>>>>        If (hinfcNewNode=0 or hInfcNodeToReplace=0) Function_return 0
+50650>>>>>>>        Get ReplaceChild hInfcNewNode hinfcNodeToReplace To hinfcNode
+50651>>>>>>>        If (hinfcNode=0) Function_return 0
+50654>>>>>>>        Set XMLInterface of hoNodetoReplace to hinfcNode
+50655>>>>>>>        Function_Return hoNodetoReplace
+50656>>>>>>>    End_Function
+50657>>>>>>>
+50657>>>>>>>    // Remove the named node. Returns handle to removed node. You must destroy
+50657>>>>>>>    // or move this removed object as needed
+50657>>>>>>>
+50657>>>>>>>    Function RemoveNamedNode String sQueryString Returns Handle
+50659>>>>>>>        Integer hoNode
+50659>>>>>>>        Integer hInfcTemplate hinfcNode
+50659>>>>>>>        Get SelectSingleNode sQueryString To hinfcTemplate
+50660>>>>>>>        If (hinfcTemplate) Begin
+50662>>>>>>>            // Remove child returns an interface to the disassociated node.
+50662>>>>>>>            // It should be disposed by setting it to an object and then calling destroy
+50662>>>>>>>            Get RemoveChild hInfcTemplate To hInfcNode
+50663>>>>>>>            If hInfcNode Get CreateXMLNode hinfcNode to hoNode
+50666>>>>>>>        End
+50666>>>>>>>>
+50666>>>>>>>        Function_Return hoNode
+50667>>>>>>>    End_Function
+50668>>>>>>>
+50668>>>>>>>    // This function creates a clone of the passed Node. if bRecurse all child nodes are also
+50668>>>>>>>    // cloned. The object Id of the new clone object is returned.
+50668>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50668>>>>>>>    // the node to the XML Document.
+50668>>>>>>>
+50668>>>>>>>    Function CloneNode integer bRecurse Returns Handle
+50670>>>>>>>        Handle hoNewNode
+50670>>>>>>>        Handle hinfcNewNode
+50670>>>>>>>        Get CloneInfcNode (if(bRecurse,-1,0)) To hinfcNewNode
+50671>>>>>>>        If hinfcNewNode ;            Get CreateXMLNode hinfcNewNode to hoNewNode
+50674>>>>>>>        Function_Return hoNewNode
+50675>>>>>>>    End_Function
+50676>>>>>>>
+50676>>>>>>>    //  Create a collection of all nodes. returns handle of a cXMLDomNodeList
+50676>>>>>>>
+50676>>>>>>>    Function ChildNodes Returns Handle
+50678>>>>>>>        Integer infcNodeList
+50678>>>>>>>        Integer hoNodeList
+50678>>>>>>>        Get phChildNodes To infcNodeList
+50679>>>>>>>        If (infcNodeList) ;            Get CreateXMLObject U_cXMLDOMNodeList infcNodeList to hoNodeList
+50682>>>>>>>        Function_Return hoNodeList
+50683>>>>>>>    End_Function
+50684>>>>>>>
+50684>>>>>>>    //  Create a collection of all attributes. returns handle of a cXMLDomNodeMapList
+50684>>>>>>>
+50684>>>>>>>    Function AttributeNodes Returns Handle
+50686>>>>>>>        Integer hoCollectionId   // Object to hold collection
+50686>>>>>>>        Integer hinfcAttributes  // XML Interface for collection
+50686>>>>>>>        Get phAttributes To hinfcAttributes
+50687>>>>>>>        If (hinfcAttributes) ;            Get CreateXMLObject U_cXMLDOMNamedNodeMap hinfcAttributes to hoCollectionId
+50690>>>>>>>        Function_Return hoCollectionId
+50691>>>>>>>    End_Function
+50692>>>>>>>
+50692>>>>>>>    // Returns a collection of just elements
+50692>>>>>>>
+50692>>>>>>>    Function ElementNodes String sQueryString Returns Handle
+50694>>>>>>>        Integer hoNodeList
+50694>>>>>>>        Integer hinfcNodeList
+50694>>>>>>>        Get ElementsByTagName sQueryString To hinfcNodeList
+50695>>>>>>>        If (hinfcNodeList <> 0) ;            Get CreateXMLObject U_cXMLDOMNodeList hinfcNodeList to hoNodeList
+50698>>>>>>>        Function_Return hoNodeList
+50699>>>>>>>    End_Function
+50700>>>>>>>
+50700>>>>>>>
+50700>>>>>>>
+50700>>>>>>>    // Return object handle for query.
+50700>>>>>>>
+50700>>>>>>>    Function FindNode String sQueryString Returns Handle
+50702>>>>>>>        Integer hoNode
+50702>>>>>>>        Integer hinfcNode
+50702>>>>>>>        Get SelectSingleNode sQueryString To hinfcNode
+50703>>>>>>>        //inkey windowindex
+50703>>>>>>>        If (hinfcNode <> 0) ;            Get CreateXMLNode hInfcNode to hoNode
+50706>>>>>>>        Function_Return hoNode
+50707>>>>>>>    End_Function
+50708>>>>>>>
+50708>>>>>>>    // Return object handle for a collection node.
+50708>>>>>>>
+50708>>>>>>>
+50708>>>>>>>    Function FindNodeList String sQueryString Returns Handle
+50710>>>>>>>        Integer hoNodeList
+50710>>>>>>>        Integer hinfcNodeList
+50710>>>>>>>        Get SelectNodes sQueryString To hinfcNodeList
+50711>>>>>>>        If (hinfcNodeList <> 0) ;            Get CreateXMLObject U_cXMLDOMNodeList hinfcNodeList to hoNodeList
+50714>>>>>>>        Function_Return hoNodeList
+50715>>>>>>>    End_Function
+50716>>>>>>>
+50716>>>>>>>    // The CreatexxxxxNode messages creates an node object for the type specified. Both
+50716>>>>>>>    // the interface and the object or of the correct type (i.e. element, comment)
+50716>>>>>>>    // These all return an object handle which can be used to place the object via
+50716>>>>>>>    // appendNode or InsertBeforeNode
+50716>>>>>>>
+50716>>>>>>>    // This function creates a child element, returning a dataflex object.
+50716>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50716>>>>>>>    // the element to the XML Document.
+50716>>>>>>>
+50716>>>>>>>    Function CreateElementNode String sTagName String sValue Returns Handle
+50718>>>>>>>        Integer hoNewElement
+50718>>>>>>>        Integer hoDocumentObject
+50718>>>>>>>        Integer infcNewElement
+50718>>>>>>>        Integer iClassId
+50718>>>>>>>        // The DataFlex objects are created inside the nodes (elements).
+50718>>>>>>>        // Create an element in the document and assign its interface to the new DF object.
+50718>>>>>>>        Get DocumentObject to hoDocumentObject
+50719>>>>>>>        Get createElement of hoDocumentObject sTagName To infcNewElement
+50720>>>>>>>        If infcNewElement Begin // if there was an error, no infc handle would be returned
+50722>>>>>>>            Get NodeClassId of hoDocumentObject NODE_ELEMENT to iClassId
+50723>>>>>>>            Get CreateXMLObject iClassId infcNewElement to hoNewElement
+50724>>>>>>>            If hoNewElement ; // very unlikely this will be zero                Set psText Of hoNewElement To sValue
+50727>>>>>>>        End
+50727>>>>>>>>
+50727>>>>>>>        Function_Return hoNewElement
+50728>>>>>>>    End_Function
+50729>>>>>>>
+50729>>>>>>>    // This function creates an attribute in a document. Attributes are _NOT_ children of an element.
+50729>>>>>>>    // A DataFlex object is returned. An attribute can be added to an xml document using
+50729>>>>>>>    // get AddAttributeNode.
+50729>>>>>>>
+50729>>>>>>>    Function CreateAttributeNode String sName String sValue Returns Handle
+50731>>>>>>>        Integer hoNewAttribute
+50731>>>>>>>        Integer hoDocumentObject
+50731>>>>>>>        Integer infcNewAttribute
+50731>>>>>>>        Integer iClassId
+50731>>>>>>>        Get DocumentObject to hoDocumentObject
+50732>>>>>>>        // Create an Attribute in the document and assign its interface to the new DF object.
+50732>>>>>>>        Get createAttribute of hoDocumentObject sName To infcNewAttribute
+50733>>>>>>>        If infcNewAttribute Begin // if there was an error, no infc handle would be returned
+50735>>>>>>>            Get NodeClassId of hoDocumentObject NODE_ATTRIBUTE to iClassId
+50736>>>>>>>            Get CreateXMLObject iClassId infcNewAttribute to hoNewAttribute
+50737>>>>>>>            // Set the value of the attribute.
+50737>>>>>>>            If hoNewAttribute ; // very unlikely this will be 0                Set psText Of hoNewAttribute To sValue
+50740>>>>>>>        End
+50740>>>>>>>>
+50740>>>>>>>        Function_Return hoNewAttribute
+50741>>>>>>>    End_Function
+50742>>>>>>>
+50742>>>>>>>    // This function creates a child comment, returning a dataflex object.
+50742>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50742>>>>>>>    // the comment to the XML Document.
+50742>>>>>>>
+50742>>>>>>>    Function CreateChildComment String sValue Returns Handle
+50744>>>>>>>        Integer hoNewComment
+50744>>>>>>>        Integer hoDocumentObject
+50744>>>>>>>        Integer infcNewComment
+50744>>>>>>>        integer iClassID
+50744>>>>>>>        Get DocumentObject to hoDocumentObject
+50745>>>>>>>        // Create an Comment in the document and assign its interface to the new DF object.
+50745>>>>>>>        Get createComment of hoDocumentObject sValue To infcNewComment
+50746>>>>>>>        If infcNewComment Begin // if there was an error, no infc handle would be returned
+50748>>>>>>>            Get NodeClassId of hoDocumentObject NODE_COMMENT to iClassId
+50749>>>>>>>            Get CreateXMLObject iClassId infcNewComment to hoNewComment
+50750>>>>>>>            If hoNewComment ; // very unlikely this will be 0                Set psText Of hoNewComment To sValue
+50753>>>>>>>        End
+50753>>>>>>>>
+50753>>>>>>>        Function_Return hoNewComment
+50754>>>>>>>    End_Function
+50755>>>>>>>
+50755>>>>>>>    // This function creates a child processing instruction, returning a dataflex object.
+50755>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50755>>>>>>>    // the processing instruction to the XML Document.
+50755>>>>>>>
+50755>>>>>>>    Function CreateChildProcessingInstruction String sTarget String sValue Returns Handle
+50757>>>>>>>        Integer hoNewProcessingInstruction
+50757>>>>>>>        Integer hoDocumentObject
+50757>>>>>>>        Integer infcNewProcessingInstruction
+50757>>>>>>>        integer iClassID
+50757>>>>>>>        Get DocumentObject to hoDocumentObject
+50758>>>>>>>        // Create an ProcessingInstruction in the document and assign its interface to the new DF object.
+50758>>>>>>>        Get createProcessingInstruction of hoDocumentObject sTarget sValue To infcNewProcessingInstruction
+50759>>>>>>>        If infcNewProcessingInstruction  Begin // if there was an error, no infc handle would be returned
+50761>>>>>>>            Get NodeClassId of hoDocumentObject NODE_PROCESSING_INSTRUCTION to iClassId
+50762>>>>>>>            Get CreateXMLObject iClassID infcNewProcessingInstruction to hoNewProcessingInstruction
+50763>>>>>>>        End
+50763>>>>>>>>
+50763>>>>>>>        Function_Return hoNewProcessingInstruction
+50764>>>>>>>    End_Function
+50765>>>>>>>
+50765>>>>>>>    // This function creates a child text node, returning a dataflex object.
+50765>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50765>>>>>>>    // the text node to the XML Document.
+50765>>>>>>>
+50765>>>>>>>    Function CreateChildTextNode String sValue Returns Handle
+50767>>>>>>>        Integer hoNewTextNode
+50767>>>>>>>        Integer hoDocumentObject
+50767>>>>>>>        Integer infcNewTextNode
+50767>>>>>>>        integer iClassID
+50767>>>>>>>        Get DocumentObject to hoDocumentObject
+50768>>>>>>>        // Create an TextNode in the document and assign its interface to the new DF object.
+50768>>>>>>>        Get createTextNode of hoDocumentObject sValue To infcNewTextNode
+50769>>>>>>>        If infcNewTextNode Begin // if there was an error, no infc handle would be returned
+50771>>>>>>>            Get NodeClassId of hoDocumentObject NODE_TEXT to iClassId
+50772>>>>>>>            Get CreateXMLObject iClassId infcNewTextNode to hoNewTextNode
+50773>>>>>>>        End
+50773>>>>>>>>
+50773>>>>>>>        Function_Return hoNewTextNode
+50774>>>>>>>    End_Function
+50775>>>>>>>
+50775>>>>>>>    // This function creates a cdata text node, returning a dataflex object.
+50775>>>>>>>    // The interface of the object returned can be used in AppendChild to add
+50775>>>>>>>    // the cdata node to the XML Document.
+50775>>>>>>>
+50775>>>>>>>    Function CreateCDATASectionNode String sValue Returns Handle
+50777>>>>>>>        Integer hoNewNode
+50777>>>>>>>        Integer hoDocumentObject
+50777>>>>>>>        Integer infcNewNode
+50777>>>>>>>        Integer iClassId
+50777>>>>>>>        // The DataFlex objects are created inside the nodes (elements).
+50777>>>>>>>        // Create an element in the document and assign its interface to the new DF object.
+50777>>>>>>>        Get DocumentObject to hoDocumentObject
+50778>>>>>>>        Get createCDATASection of hoDocumentObject sValue To infcNewNode
+50779>>>>>>>        If infcNewNode Begin
+50781>>>>>>>            Get NodeClassId of hoDocumentObject NODE_CDATA_SECTION to iClassId
+50782>>>>>>>            Get CreateXMLObject iClassId infcNewNode to hoNewNode
+50783>>>>>>>        End
+50783>>>>>>>>
+50783>>>>>>>        Function_Return hoNewNode
+50784>>>>>>>    End_Function
+50785>>>>>>>
+50785>>>>>>>    // Create a document fragment.  Document fragments can be used to house nodes temporarily. When
+50785>>>>>>>    // You append or insert a document fragment (appendNode InsertBeforeNode) child nodes are appended
+50785>>>>>>>    // to the destination object and not the fragment node itself. This is useful!
+50785>>>>>>>
+50785>>>>>>>    Function CreateDocumentFragmentNode Returns Handle
+50787>>>>>>>        Integer hoNew
+50787>>>>>>>        Integer hoDocumentObject
+50787>>>>>>>        Integer infcNew
+50787>>>>>>>        integer iClassID
+50787>>>>>>>        Get DocumentObject to hoDocumentObject
+50788>>>>>>>        // Create an Comment in the document and assign its interface to the new DF object.
+50788>>>>>>>        Get createDocumentFragment of hoDocumentObject To infcNew
+50789>>>>>>>        If infcNew Begin // if there was an error, no infc handle would be returned
+50791>>>>>>>            Get NodeClassId of hoDocumentObject NODE_DOCUMENT_FRAGMENT to iClassId
+50792>>>>>>>            Get CreateXMLObject iClassId infcNew to hoNew
+50793>>>>>>>        End
+50793>>>>>>>>
+50793>>>>>>>        Function_Return hoNew
+50794>>>>>>>    End_Function
+50795>>>>>>>
+50795>>>>>>>    //  Create a Node of any passed Type (e.g. Node_element). Normally you don't need this as there are
+50795>>>>>>>    //  specific messages to do this for each node type. Node that this lets you pass namespaces as a separate
+50795>>>>>>>    //  parameter. With all of the other messages (e.g. createElementNode) you pass namespaces as prefixed to
+50795>>>>>>>    // the tagname (e.g. Get CreateElementNode "MyNameSpace:MyTag" "MyValue" to hoEle)
+50795>>>>>>>
+50795>>>>>>>    Function CreateChildNode Integer iNodeType String sTagName String sNameSpace Returns Handle
+50797>>>>>>>        Integer hoNewNode hoDocumentObject
+50797>>>>>>>        Integer infcNewNode
+50797>>>>>>>        Integer iClassid iType
+50797>>>>>>>        Get DocumentObject to hoDocumentObject
+50798>>>>>>>        Get NodeClassId iNodeType to iClassId
+50799>>>>>>>        If (iClassId<>0) Begin
+50801>>>>>>>            // Create a node in the document and assign its interface to the new DF object.
+50801>>>>>>>            Get createNode of hoDocumentObject iNodeType sTagName sNameSpace To infcNewNode
+50802>>>>>>>            // this is required to force the interface type to be correct.
+50802>>>>>>>            Move (invokexml(DF_IXMLDOMNODE, GET_piNodeType, infcNewNode, 0, 0, 0, 0)) to iType
+50803>>>>>>>            Move (invokexml(DF_IXMLDOMNODE, GET_ChangeNodeType, infcNewNode, iType, 1, 0, 0)) to infcNewNode
+50804>>>>>>>
+50804>>>>>>>            If infcNewNode ;                Get CreateXMLObject iClassId infcNewNode to hoNewNode
+50807>>>>>>>        End
+50807>>>>>>>>
+50807>>>>>>>        Function_Return hoNewNode
+50808>>>>>>>    End_Function
+50809>>>>>>>
+50809>>>>>>>
+50809>>>>>>>
+50809>>>>>>>    // The Addxxxxx messages create a new node and appends it to the list. When used as a function,
+50809>>>>>>>    // the object handle is returned and must be disposed of later by the programmer.
+50809>>>>>>>    // When used as a procedure, the object is destroyed--it just does it and is done.
+50809>>>>>>>
+50809>>>>>>>    Function AddElement String sTagName String sValue Returns Handle
+50811>>>>>>>        Integer hoNewElement
+50811>>>>>>>        Get CreateElementNode sTagName sValue To hoNewElement
+50812>>>>>>>        If hoNewElement Get AppendNode hoNewElement to hoNewElement
+50815>>>>>>>        Function_return hoNewElement
+50816>>>>>>>    End_Function
+50817>>>>>>>
+50817>>>>>>>    Procedure AddElement String sTagName String sValue
+50819>>>>>>>        Integer hoNewElement
+50819>>>>>>>        Get AddElement sTagName sValue To hoNewElement
+50820>>>>>>>        If hoNewElement ;            Send Destroy To hoNewElement
+50823>>>>>>>        Else ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddElement"))
+50825>>>>>>>    End_procedure
+50826>>>>>>>
+50826>>>>>>>    // this returns the object, This is often needed
+50826>>>>>>>
+50826>>>>>>>
+50826>>>>>>>
+50826>>>>>>>    //(new)
+50826>>>>>>>    Function CreateElementNodeNS String sNameSpace String sTagName String sValue returns Handle
+50828>>>>>>>        Integer hoNewElement
+50828>>>>>>>        Get CreateChildNode NODE_ELEMENT sTagName sNameSpace to hoNewElement
+50829>>>>>>>        If (hoNewElement and sValue<>"") ;            Set psText Of hoNewElement To sValue
+50832>>>>>>>        Function_Return hoNewElement
+50833>>>>>>>    End_procedure
+50834>>>>>>>
+50834>>>>>>>
+50834>>>>>>>    // this returns the object, This is often needed
+50834>>>>>>>
+50834>>>>>>>    //(new)
+50834>>>>>>>    Function AddElementNS string sNameSpace String sTagName String sValue Returns Handle
+50836>>>>>>>        Integer hoNewElement
+50836>>>>>>>        Get CreateElementNodeNS sNameSpace sTagName sValue To hoNewElement
+50837>>>>>>>        If hoNewElement Begin
+50839>>>>>>>            Get AppendNode hoNewElement to hoNewElement
+50840>>>>>>>        end
+50840>>>>>>>>
+50840>>>>>>>        Function_return hoNewElement
+50841>>>>>>>    End_Function
+50842>>>>>>>
+50842>>>>>>>    //(new)
+50842>>>>>>>    Procedure AddElementNS String sNameSpace String sTagName String sValue
+50844>>>>>>>        Integer hoNewElement
+50844>>>>>>>        Get AddElementNS sNameSpace sTagName sValue to hoNewElement
+50845>>>>>>>        If hoNewElement ;            Send Destroy To hoNewElement
+50848>>>>>>>        Else ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddElementNS"))
+50850>>>>>>>    End_procedure
+50851>>>>>>>
+50851>>>>>>>    //(new)
+50851>>>>>>>    Function AddAttributeNode handle hoNode returns Handle
+50853>>>>>>>        handle hInfc
+50853>>>>>>>        get Set_AttributeNode (XmlInterface(hoNode)) to hInfc
+50854>>>>>>>        if hInfc ; // if ret value we have a replacement            set XmlInterface of hoNode to hInfc
+50857>>>>>>>        function_return hoNode
+50858>>>>>>>    End_Function
+50859>>>>>>>
+50859>>>>>>>//    // is this needed
+50859>>>>>>>//    Function AddAttributeNodeNS handle hoNode returns Handle
+50859>>>>>>>//        Get AddAttributeNode hoNode to hoNode
+50859>>>>>>>//        function_return hoNode
+50859>>>>>>>//    End_Function
+50859>>>>>>>
+50859>>>>>>>    //(new)
+50859>>>>>>>    Function AttributeValueNode string sName returns Handle
+50861>>>>>>>        handle hInfc
+50861>>>>>>>        handle hoNode
+50861>>>>>>>        get AttributeNode sName to hInfc
+50862>>>>>>>        if hInfc ; // if ret value we have a replacement           Get CreateXMLNode hInfc to hoNode
+50865>>>>>>>        function_return hoNode
+50866>>>>>>>    End_Function
+50867>>>>>>>
+50867>>>>>>>    //(new)
+50867>>>>>>>    Function AttributeValueNodeNS string sNameSpace string sBaseName returns Handle
+50869>>>>>>>        handle hoAttrs hoAttr
+50869>>>>>>>        string sValue
+50869>>>>>>>        Get AttributeNodes to hoAttrs
+50870>>>>>>>        If hoAttrs begin
+50872>>>>>>>            Get QualifiedNode of hoAttrs sNamespace sBaseName to hoAttr
+50873>>>>>>>            send destroy of hoAttrs
+50874>>>>>>>        end
+50874>>>>>>>>
+50874>>>>>>>        function_return hoAttr
+50875>>>>>>>    End_Function
+50876>>>>>>>
+50876>>>>>>>
+50876>>>>>>>    //(new)
+50876>>>>>>>    Function CreateAttributeNodeNS string sNameSpace string sName String sValue Returns Handle
+50878>>>>>>>        Integer hoNewAttribute
+50878>>>>>>>        Get CreateChildNode NODE_ATTRIBUTE sName sNameSpace To hoNewAttribute
+50879>>>>>>>        If hoNewAttribute ;            Set psText Of hoNewAttribute To sValue
+50882>>>>>>>        Function_Return hoNewAttribute
+50883>>>>>>>    End_Function
+50884>>>>>>>
+50884>>>>>>>    //(new)
+50884>>>>>>>    Procedure AddAttributeNS String sNameSpace String sName String sValue
+50886>>>>>>>       handle hoNode
+50886>>>>>>>       Get CreateAttributeNodeNS sNameSpace sName sValue to hoNode
+50887>>>>>>>       If hoNode Begin
+50889>>>>>>>          Get AddAttributeNode hoNode to hoNode
+50890>>>>>>>          If hoNode Send Destroy of hoNode
+50893>>>>>>>       end
+50893>>>>>>>>
+50893>>>>>>>       Else ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddAttributeNS"))
+50895>>>>>>>    End_Procedure
+50896>>>>>>>
+50896>>>>>>>
+50896>>>>>>>       // This function encapsulates creation and addition of attributes to a node.
+50896>>>>>>>    // should only work with element class
+50896>>>>>>>    Procedure AddAttribute String sName String sValue
+50898>>>>>>>        Set AttributeValue sName to sValue
+50899>>>>>>>    End_Procedure
+50900>>>>>>>
+50900>>>>>>>    // This function encapsulates creation and addition of comments to a node.
+50900>>>>>>>    // The return value is a Boolean that is currently unused.
+50900>>>>>>>
+50900>>>>>>>    Procedure AddChildComment String sValue
+50902>>>>>>>        Integer hoNewNode
+50902>>>>>>>        Get createChildComment sValue To hoNewNode
+50903>>>>>>>        If not hoNewNode ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddChildComment"))
+50906>>>>>>>        Else Begin
+50907>>>>>>>            Get AppendNode hoNewNode to hoNewNode
+50908>>>>>>>            Send Destroy To hoNewNode
+50909>>>>>>>        End
+50909>>>>>>>>
+50909>>>>>>>    End_Procedure
+50910>>>>>>>
+50910>>>>>>>    // This function encapsulates creation and addition of processing instructions to a node.
+50910>>>>>>>    // The return value is a Boolean that is currently unused.
+50910>>>>>>>
+50910>>>>>>>    Procedure AddChildProcessingInstruction String sTarget String sValue
+50912>>>>>>>        Integer hoNewNode
+50912>>>>>>>        Get createChildProcessingInstruction sTarget sValue To hoNewNode
+50913>>>>>>>        If not hoNewNode ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddChildProcessingInstruction"))
+50916>>>>>>>        Else Begin
+50917>>>>>>>            Get AppendNode hoNewNode to hoNewNode
+50918>>>>>>>            Send Destroy To hoNewNode
+50919>>>>>>>        end
+50919>>>>>>>>
+50919>>>>>>>    End_Procedure
+50920>>>>>>>
+50920>>>>>>>
+50920>>>>>>>    // This function encapsulates creation and addition of text nodes to a node.
+50920>>>>>>>    // The return value is a Boolean that is currently unused.
+50920>>>>>>>
+50920>>>>>>>    Procedure AddChildTextNode String sValue
+50922>>>>>>>        Integer hoNewNode
+50922>>>>>>>        Get createChildTextNode sValue To hoNewNode
+50923>>>>>>>        If not hoNewNode ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddChildTextNode"))
+50926>>>>>>>        Else Begin
+50927>>>>>>>            Get AppendNode hoNewNode to hoNewNode
+50928>>>>>>>            Send Destroy To hoNewNode
+50929>>>>>>>        End
+50929>>>>>>>>
+50929>>>>>>>    End_Procedure
+50930>>>>>>>
+50930>>>>>>>    // This procedure encapsulates creation and addition of cdata text nodes to a node.
+50930>>>>>>>    Procedure AddCDataSection String sValue
+50932>>>>>>>        handle hoNewNode
+50932>>>>>>>        Get CreateCDATASectionNode sValue To hoNewNode
+50933>>>>>>>        If not hoNewNode ;            Error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_AddCDataSection"))
+50936>>>>>>>        Else Begin
+50937>>>>>>>            Get AppendNode hoNewNode to hoNewNode
+50938>>>>>>>            Send Destroy To hoNewNode
+50939>>>>>>>        end
+50939>>>>>>>>
+50939>>>>>>>    End_procedure
+50940>>>>>>>
+50940>>>>>>>
+50940>>>>>>>    Function AddChildNode Integer iNodeType String sTagName String sNameSpace Returns Handle
+50942>>>>>>>        Integer hoNewNode
+50942>>>>>>>        Integer hoDocumentObject
+50942>>>>>>>        Get DocumentObject to hoDocumentObject
+50943>>>>>>>        Get createChildNode of hoDocumentObject iNodeType sTagName sNamespace To hoNewNode
+50944>>>>>>>        If hoNewNode ;            Get AppendNode hoNewNode to hoNewNode
+50947>>>>>>>        Function_Return hoNewNode
+50948>>>>>>>    End_Function
+50949>>>>>>>
+50949>>>>>>>    // ChildNodeValue is used to get the "value" of an element. This is useful when the element
+50949>>>>>>>    // only has a single value (similar to an attribute).
+50949>>>>>>>
+50949>>>>>>>    Function ChildNodeValue String sTagName Returns String
+50951>>>>>>>        Integer hoTempNode
+50951>>>>>>>        Integer hinfcTempNode
+50951>>>>>>>        String sRetVal
+50951>>>>>>>        Get SelectSingleNode sTagName To hinfcTempNode
+50952>>>>>>>        //showln "...." hinfctempNode '  ' stagName ' ' (psNodeName(self))
+50952>>>>>>>        If (hinfcTempNode <> 0) Begin
+50954>>>>>>>            Get CreateXMLObject U_BaseXMLDOMNode hinfcTempNode to hoTempNode
+50955>>>>>>>            If hoTempNode Begin
+50957>>>>>>>                Get psText Of hoTempNode To sRetVal
+50958>>>>>>>                Send Destroy of hoTempNode
+50959>>>>>>>            end
+50959>>>>>>>>
+50959>>>>>>>        End
+50959>>>>>>>>
+50959>>>>>>>        Function_Return sRetVal
+50960>>>>>>>    End_Function
+50961>>>>>>>
+50961>>>>>>>    // This simple function allows a parent to change the text of one of its elements.
+50961>>>>>>>    // This actually occurs quite a bit, because (as stated above) lowest level
+50961>>>>>>>    // elements are frequently used as properties.
+50961>>>>>>>    //
+50961>>>>>>>    Procedure SetChildNodeValue String sTagName String sValue
+50963>>>>>>>        Integer hoTempNode
+50963>>>>>>>        Integer hinfcTempNode
+50963>>>>>>>        // Search for the node that matches.
+50963>>>>>>>        Get SelectSingleNode sTagName To hinfcTempNode
+50964>>>>>>>        // If no match is found, add a new element with the tag.
+50964>>>>>>>        If (hinfcTempNode = 0) ;            Send AddElement sTagName sValue
+50967>>>>>>>        Else Begin
+50968>>>>>>>            Get CreateXMLObject U_BaseXMLDOMNode hinfcTempNode to hoTempNode
+50969>>>>>>>            If hoTempNode Begin
+50971>>>>>>>                // Set the text of the element.
+50971>>>>>>>                Set psText Of hoTempNode To sValue
+50972>>>>>>>                Send Destroy To hoTempNode
+50973>>>>>>>            end
+50973>>>>>>>>
+50973>>>>>>>            Else ;                error DFERR_XML_INTERNAL_ERROR (SFormat(C_$XmlMethodFailure, "msg_SetChildNodeValue"))
+50975>>>>>>>        end
+50975>>>>>>>>
+50975>>>>>>>    End_Procedure
+50976>>>>>>>
+50976>>>>>>>    // These messages are used to allow you to travese through a nodes.
+50976>>>>>>>
+50976>>>>>>>    Function FirstChild Returns Handle
+50978>>>>>>>        handle hoChild
+50978>>>>>>>        integer hinfcChild
+50978>>>>>>>        Get phFirstChild  to hinfcChild
+50979>>>>>>>        If (hinfcChild) ;            Get CreateXMLNode hinfcChild to hoChild
+50982>>>>>>>        Function_return hoChild
+50983>>>>>>>    end_function
+50984>>>>>>>
+50984>>>>>>>    Function NextSibling Returns Handle
+50986>>>>>>>        handle hoChild
+50986>>>>>>>        integer hinfcChild
+50986>>>>>>>        Get phNextSibling  to hinfcChild
+50987>>>>>>>        If (hinfcChild) ;            Get CreateXMLNode hinfcChild to hoChild
+50990>>>>>>>        Function_return hoChild
+50991>>>>>>>    end_function
+50992>>>>>>>
+50992>>>>>>>    Function PreviousSibling Returns Handle
+50994>>>>>>>        handle hoChild
+50994>>>>>>>        integer hinfcChild
+50994>>>>>>>        Get phPreviousSibling  to hinfcChild
+50995>>>>>>>        If (hinfcChild) ;            Get CreateXMLNode hinfcChild to hoChild
+50998>>>>>>>        Function_return hoChild
+50999>>>>>>>    end_function
+51000>>>>>>>
+51000>>>>>>>    Function LastChild Returns Handle
+51002>>>>>>>        handle hoChild
+51002>>>>>>>        integer hinfcChild
+51002>>>>>>>        Get phLastChild  to hinfcChild
+51003>>>>>>>        If (hinfcChild) ;            Get CreateXMLNode hinfcChild to hoChild
+51006>>>>>>>        Function_return hoChild
+51007>>>>>>>    end_function
+51008>>>>>>>
+51008>>>>>>>    // Enumerate through all nodes.
+51008>>>>>>>
+51008>>>>>>>    Procedure EnumerateNodes Integer iMsg Integer hoReceiver String sVal1 String sVal2
+51010>>>>>>>        Integer i iLen
+51010>>>>>>>        Integer hoNode
+51010>>>>>>>        Integer hoNodeCollection
+51010>>>>>>>        Get ChildNodes To hoNodeCollection
+51011>>>>>>>        If (hoNodeCollection <> 0) Begin
+51013>>>>>>>            Get NodeListLength of hoNodeCollection to iLen
+51014>>>>>>>            Decrement iLen
+51015>>>>>>>            For i From 0 To iLen
+51021>>>>>>>>
+51021>>>>>>>                // For each record, process its fields.
+51021>>>>>>>                Get CollectionNode Of hoNodeCollection i To hoNode
+51022>>>>>>>                Send iMsg Of hoReceiver hoNode sVal1 sVal2
+51023>>>>>>>                Send Destroy Of hoNode
+51024>>>>>>>            Loop
+51025>>>>>>>>
+51025>>>>>>>            Send Destroy of hoNodeCollection
+51026>>>>>>>        End
+51026>>>>>>>>
+51026>>>>>>>    End_Procedure
+51027>>>>>>>
+51027>>>>>>>    // Enumerate through all elements.
+51027>>>>>>>
+51027>>>>>>>    Procedure EnumerateElements Integer iMsg Integer hoReceiver String sVal1 String sVal2
+51029>>>>>>>        Integer i iLen
+51029>>>>>>>        Integer hoNode
+51029>>>>>>>        Integer hoNodeCollection
+51029>>>>>>>        Get ChildNodes To hoNodeCollection
+51030>>>>>>>        If (hoNodeCollection <> 0) Begin
+51032>>>>>>>            Get NodeListLength of hoNodeCollection to iLen
+51033>>>>>>>            Decrement iLen
+51034>>>>>>>            For i From 0 To iLen
+51040>>>>>>>>
+51040>>>>>>>                // For each record, process its fields.
+51040>>>>>>>                Get CollectionNode Of hoNodeCollection i To hoNode
+51041>>>>>>>                If (piNodeType(hoNode)=NODE_ELEMENT) ;                    Send iMsg Of hoReceiver hoNode sVal1 sVal2
+51044>>>>>>>                Send Destroy Of hoNode
+51045>>>>>>>            Loop
+51046>>>>>>>>
+51046>>>>>>>            Send Destroy of hoNodeCollection
+51047>>>>>>>        End
+51047>>>>>>>>
+51047>>>>>>>    End_Procedure
+51048>>>>>>>
+51048>>>>>>>
+51048>>>>>>>    // enumerate through all attributes. There is no recurse here because attributes will not
+51048>>>>>>>    // contain attributes.
+51048>>>>>>>
+51048>>>>>>>    Procedure EnumerateAttributes Integer iMsg Integer hoReceiver String sSomeValue
+51050>>>>>>>        Integer i iLen
+51050>>>>>>>        Integer hoNode
+51050>>>>>>>        Integer hoNodeMapCollection
+51050>>>>>>>        Get AttributeNodes To hoNodeMapCollection
+51051>>>>>>>        If (hoNodeMapCollection <> 0) Begin
+51053>>>>>>>            Get NodeListLength of hoNodeMapCollection to iLen
+51054>>>>>>>            Decrement iLen
+51055>>>>>>>            For i From 0 To iLen
+51061>>>>>>>>
+51061>>>>>>>                // For each record, process its fields.
+51061>>>>>>>                Get CollectionNode Of hoNodeMapCollection i To hoNode
+51062>>>>>>>                Send iMsg Of hoReceiver hoNode sSomeValue
+51063>>>>>>>                Send Destroy Of hoNode
+51064>>>>>>>            Loop
+51065>>>>>>>>
+51065>>>>>>>            Send Destroy of hoNodeMapCollection
+51066>>>>>>>        End
+51066>>>>>>>>
+51066>>>>>>>    End_Procedure
+51067>>>>>>>
+51067>>>>>>>
+51067>>>>>>>    Function XSLTransformation Integer hoXSLDocument Returns String
+51069>>>>>>>        integer infcXSLStartAt
+51069>>>>>>>        String sBuffer
+51069>>>>>>>        // Transformation is of current object using passed XSLDocument.
+51069>>>>>>>        Get XMLInterface Of hoXSLDocument to infcXSLStartAt
+51070>>>>>>>        Get TransformNode infcXSLStartAt to sBuffer
+51071>>>>>>>        Function_Return sBuffer
+51072>>>>>>>    End_Function
+51073>>>>>>>
+51073>>>>>>>    // This allows for transformations not limited to the size of the string buffer
+51073>>>>>>>    //
+51073>>>>>>>    // Note that it is up to the programmer to dispose of the memory allocated at pBuffer
+51073>>>>>>>    // by using the free(pBuffer) function
+51073>>>>>>>    //
+51073>>>>>>>    Function XSLTransformationToAddress Integer hoXSLDocument Returns Address
+51075>>>>>>>        integer infcXSLStartAt
+51075>>>>>>>        Address pBuffer
+51075>>>>>>>        // Transformation is of current object using passed XSLDocument.
+51075>>>>>>>        Get XMLInterface Of hoXSLDocument to infcXSLStartAt
+51076>>>>>>>        Get TransformNodeToAddress infcXSLStartAt to pBuffer
+51077>>>>>>>        Function_Return pBuffer
+51078>>>>>>>    End_Function
+51079>>>>>>>
+51079>>>>>>>
+51079>>>>>>>    // return an object that is the parent of the current node
+51079>>>>>>>    Function ParentNode returns handle
+51081>>>>>>>        Handle hoId
+51081>>>>>>>        Handle hinfcXMLInterface
+51081>>>>>>>        get phParentNode to hinfcXMLInterface
+51082>>>>>>>        If (hinfcXMLInterface) ;            Get CreateXmlNode hinfcXMLInterface to hoID
+51085>>>>>>>        Function_return hoID
+51086>>>>>>>    End_function
+51087>>>>>>>
+51087>>>>>>>    // extract base name from string. e.g.: ns:name --> name
+51087>>>>>>>    //
+51087>>>>>>>    Function BaseNameFromQName string sName returns string
+51089>>>>>>>        integer iPos
+51089>>>>>>>        Move (Pos(":",sName)) to iPos
+51090>>>>>>>        If iPos Begin
+51092>>>>>>>            Move (remove(sName,1,iPos)) to sName
+51093>>>>>>>        end
+51093>>>>>>>>
+51093>>>>>>>        function_return sName
+51094>>>>>>>    end_function
+51095>>>>>>>
+51095>>>>>>>    // extract prefix name from string. e.g.: ns:name --> ns
+51095>>>>>>>    //
+51095>>>>>>>    Function PrefixNameFromQName string sName returns string
+51097>>>>>>>        integer iPos
+51097>>>>>>>        Move (Pos(":",sName)) to iPos
+51098>>>>>>>        If iPos Begin
+51100>>>>>>>            Move (left(sName,iPos-1)) to sName
+51101>>>>>>>        end
+51101>>>>>>>>
+51101>>>>>>>        function_return sName
+51102>>>>>>>    end_function
+51103>>>>>>>
+51103>>>>>>>    // Same as NextSibling except it destroys the current node
+51103>>>>>>>    //
+51103>>>>>>>    Function NextNode Returns Handle
+51105>>>>>>>        handle hoNode
+51105>>>>>>>        Get NextSibling to hoNode
+51106>>>>>>>        Send Destroy
+51107>>>>>>>        Function_return hoNode
+51108>>>>>>>    end_function
+51109>>>>>>>
+51109>>>>>>>
+51109>>>>>>>    // Returns true if node is element and namespace and base name match
+51109>>>>>>>    //
+51109>>>>>>>    Function IsElementNS string sNamespaceURI string sBaseName returns boolean
+51111>>>>>>>         Function_return (piNodeType(self)=NODE_ELEMENT and ;                          psNameSpaceURI(self)=sNamespaceURI and ;                          psBaseName(self)=sBaseName )
+51112>>>>>>>    end_function
+51113>>>>>>>
+51113>>>>>>>    // Returns node of first occurence of child node matching namespace and base name
+51113>>>>>>>    //
+51113>>>>>>>    Function ChildElementNS string sNameSpaceURI string sBaseName returns handle
+51115>>>>>>>        handle hoNode
+51115>>>>>>>        Get FirstChild to hoNode
+51116>>>>>>>        While (hoNode and not(IsElementNS(hoNode, sNameSpaceURI, sBaseName)))
+51120>>>>>>>            Get NextNode of hoNode to hoNode
+51121>>>>>>>        end
+51122>>>>>>>>
+51122>>>>>>>        function_return hoNode
+51123>>>>>>>    end_function
+51124>>>>>>>
+51124>>>>>>>    // Returns node of next occurence of sibling node matching namespace and base name
+51124>>>>>>>    //
+51124>>>>>>>    Function NextElementNS string sNameSpaceURI string sBaseName returns handle
+51126>>>>>>>        handle hoNode
+51126>>>>>>>        Get NextSibling to hoNode
+51127>>>>>>>        While (hoNode and not(IsElementNS(hoNode, sNameSpaceURI, sBaseName)))
+51131>>>>>>>            Get NextNode of hoNode to hoNode
+51132>>>>>>>        end
+51133>>>>>>>>
+51133>>>>>>>        Send Destroy
+51134>>>>>>>        function_return hoNode
+51135>>>>>>>    end_function
+51136>>>>>>>
+51136>>>>>>>
+51136>>>>>>>    // Returns value (string) first occurence of child node matching namespace and base name
+51136>>>>>>>    //
+51136>>>>>>>    Function ChildElementValueNS string sNameSpaceURI string sBaseName returns string
+51138>>>>>>>        handle hoNext
+51138>>>>>>>        string sText
+51138>>>>>>>        Get ChildElementNS sNameSpaceURI sBaseName to hoNext
+51139>>>>>>>        If hoNext begin
+51141>>>>>>>            Get psText of hoNext to sText
+51142>>>>>>>            send destroy of hoNext
+51143>>>>>>>        end
+51143>>>>>>>>
+51143>>>>>>>        Function_return sText
+51144>>>>>>>    end_function
+51145>>>>>>>
+51145>>>>>>>    Procedure SetChildElementValueNS string sNameSpaceURI string sBaseName String sValue
+51147>>>>>>>        Integer hoNode
+51147>>>>>>>        Integer hinfcTempNode
+51147>>>>>>>        Get ChildElementNS sNameSpaceURI sBaseName to hoNode
+51148>>>>>>>        If (hoNode=0) begin
+51150>>>>>>>            Send AddElementNS sNameSpaceURI sBaseName sValue
+51151>>>>>>>        end
+51151>>>>>>>>
+51151>>>>>>>        Else Begin
+51152>>>>>>>            Set psText Of hoNode To sValue
+51153>>>>>>>            send destroy of hoNode
+51154>>>>>>>        end
+51154>>>>>>>>
+51154>>>>>>>    End_Procedure
+51155>>>>>>>
+51155>>>>>>>
+51155>>>>>>>//    // Returns node of first occurence of child node matching namespace and base name
+51155>>>>>>>//    // that has an attrib value that contains a specified value
+51155>>>>>>>//    //
+51155>>>>>>>//    //Doc/ Visibility=Public
+51155>>>>>>>//    Function FindElementNodeWithAttribNS string sNamespace string sBaseName string sAttribName string sAttribValue returns handle
+51155>>>>>>>//        handle hoNext hoNode
+51155>>>>>>>//        string sName
+51155>>>>>>>//        Get FirstChild to hoNode
+51155>>>>>>>//        While (hoNode)
+51155>>>>>>>//            If (IsElementNS(hoNode, sNameSpace, sBaseName)) begin
+51155>>>>>>>//                Get AttributeValue of hoNode sAttribName to sName
+51155>>>>>>>//                If (sName=sAttribValue) Begin
+51155>>>>>>>//                    Function_return hoNode
+51155>>>>>>>//                end
+51155>>>>>>>//            end
+51155>>>>>>>//            Get NextSibling of hoNode to hoNext
+51155>>>>>>>//            Send Destroy of hoNode
+51155>>>>>>>//            Move hoNext to hoNode
+51155>>>>>>>//        end
+51155>>>>>>>//        function_return 0
+51155>>>>>>>//    end_function
+51155>>>>>>>
+51155>>>>>>>    // pass a prefix and try to finds its NameSpaceURI. Start at current node and work up to parent.
+51155>>>>>>>    // This can be useful when a qualified name is found in an attribute value
+51155>>>>>>>    //
+51155>>>>>>>    Function PrefixToNamespaceURI string sPrefix returns string
+51157>>>>>>>        handle hoNode
+51157>>>>>>>        Integer i iNodes
+51157>>>>>>>        Integer hoNodes hoParentNode hoAttNode
+51157>>>>>>>        Boolean bDone bParent
+51157>>>>>>>        string sAttPrefix sName sNameSpace
+51157>>>>>>>
+51157>>>>>>>        Move self to hoNode
+51158>>>>>>>        While Not bDone
+51162>>>>>>>            Get AttributeNodes of hoNode To hoNodes
+51163>>>>>>>            If (hoNodes <> 0) Begin
+51165>>>>>>>                Get NodeListLength of hoNodes to iNodes
+51166>>>>>>>                For i From 0 To (iNodes-1)
+51172>>>>>>>>
+51172>>>>>>>                    // For each record, process its fields.
+51172>>>>>>>                    Get CollectionNode Of hoNodes i To hoAttNode
+51173>>>>>>>                    Get psPrefix of hoAttNode to sAttPrefix
+51174>>>>>>>                    If (sAttPrefix="xmlns") Begin
+51176>>>>>>>                        Get psBaseName of hoAttNode to sName
+51177>>>>>>>                        If (sName=sPrefix) Begin
+51179>>>>>>>                            Get Value of hoAttNode to sNameSpace
+51180>>>>>>>                            Move true to bDone
+51181>>>>>>>                            Move (iNodes-1) to i
+51182>>>>>>>                        end
+51182>>>>>>>>
+51182>>>>>>>                    end
+51182>>>>>>>>
+51182>>>>>>>                    Send Destroy Of hoAttNode
+51183>>>>>>>                Loop
+51184>>>>>>>>
+51184>>>>>>>                Send Destroy of hoNodes
+51185>>>>>>>            End
+51185>>>>>>>>
+51185>>>>>>>            Get ParentNode of hoNode to hoParentNode
+51186>>>>>>>            If bParent send destroy of hoNode
+51189>>>>>>>            If not bDone begin
+51191>>>>>>>                If not hoParentNode move true to bDone
+51194>>>>>>>                Else begin
+51195>>>>>>>                    Move True to bParent
+51196>>>>>>>                    Move hoParentNode to hoNode
+51197>>>>>>>                end
+51197>>>>>>>>
+51197>>>>>>>            end
+51197>>>>>>>>
+51197>>>>>>>        end
+51198>>>>>>>>
+51198>>>>>>>        Function_return sNameSpace
+51199>>>>>>>    end_function
+51200>>>>>>>
+51200>>>>>>>
+51200>>>>>>>
+51200>>>>>>>End_Class
+51201>>>>>>>
+51201>>>>>>>// Set up basic inheritance for specialized forms of XML classes.
+51201>>>>>>>// This needs to be done so we can make objects of these types.
+51201>>>>>>>
+51201>>>>>>>Class cXMLDOMElement Is A BaseXmlDomElement
+51202>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51203>>>>>>>
+51203>>>>>>>// Send AddAttribute
+51203>>>>>>>// Get  AddAttributeNode
+51203>>>>>>>// Send RemoveAttribute
+51203>>>>>>>// Get  AttributeValue
+51203>>>>>>>// Get  AttributeValueNode
+51203>>>>>>>
+51203>>>>>>>// Send AddAttributeNS
+51203>>>>>>>// Get  AddAttributeNodeNS
+51203>>>>>>>// Send RemoveAttributeNs
+51203>>>>>>>// Get  AttributeValueNS
+51203>>>>>>>// Get  AttributeValueNodeNS
+51203>>>>>>>
+51203>>>>>>>    // Should use AddAttributeValue...does same thing
+51203>>>>>>>    Procedure SetAttributeValue String sName String sValue
+51205>>>>>>>        Send AddAttribute sName sValue
+51206>>>>>>>    End_Procedure
+51207>>>>>>>
+51207>>>>>>>    // Note: Get_AttributeValue already there
+51207>>>>>>>
+51207>>>>>>>    Procedure RemoveAttribute string sName
+51209>>>>>>>        integer iVal
+51209>>>>>>>        Get RemoveAttribute sName to iVal
+51210>>>>>>>    End_procedure
+51211>>>>>>>
+51211>>>>>>>    //(new)
+51211>>>>>>>    Function AttributeValueNS string sNameSpace string sBaseName returns string
+51213>>>>>>>        handle hoAttr
+51213>>>>>>>        string sValue
+51213>>>>>>>        Get AttributeValueNodeNS sNameSpace sBaseName to hoAttr
+51214>>>>>>>        If hoAttr Begin
+51216>>>>>>>            Get Value of hoAttr to sValue
+51217>>>>>>>            send destroy of hoAttr
+51218>>>>>>>        end
+51218>>>>>>>>
+51218>>>>>>>        function_return sValue
+51219>>>>>>>    end_function
+51220>>>>>>>
+51220>>>>>>>    //(new)
+51220>>>>>>>    Procedure RemoveAttributeNS string sNameSpace string sBaseName
+51222>>>>>>>        handle hoAttrs hoAttr
+51222>>>>>>>        string sValue
+51222>>>>>>>        Get AttributeNodes to hoAttrs
+51223>>>>>>>        If hoAttrs begin
+51225>>>>>>>            Get RemoveQualifiedNode of hoAttrs sNamespace sBaseName to hoAttr
+51226>>>>>>>            If hoAttr ;                send destroy of hoAttr
+51229>>>>>>>        end
+51229>>>>>>>>
+51229>>>>>>>        send destroy of hoAttrs
+51230>>>>>>>    end_procedure
+51231>>>>>>>
+51231>>>>>>>End_Class
+51232>>>>>>>
+51232>>>>>>>Class cXMLDOMNode Is A BaseXmlDomNode
+51233>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51234>>>>>>>End_Class
+51235>>>>>>>
+51235>>>>>>>Class cXMLDOMAttribute Is A BaseXmlDomAttribute
+51236>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51237>>>>>>>End_Class
+51238>>>>>>>
+51238>>>>>>>Class cXMLDOMComment Is A BaseXmlDomComment
+51239>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51240>>>>>>>End_Class
+51241>>>>>>>
+51241>>>>>>>Class cXMLDOMProcessingInstruction Is A BaseXmlDomProcessingInstruction
+51242>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51243>>>>>>>End_Class
+51244>>>>>>>
+51244>>>>>>>Class cXMLDOMTextNode Is A BaseXmlDomTextNode
+51245>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51246>>>>>>>End_Class
+51247>>>>>>>
+51247>>>>>>>Class cXMLDOMCDATASection Is A BaseXmlDomCDATASection
+51248>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51249>>>>>>>End_Class
+51250>>>>>>>
+51250>>>>>>>Class cXMLDOMDocumentType Is A BaseXmlDomDocumentType
+51251>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51252>>>>>>>
+51252>>>>>>>//        Function EnumerateEntities Integer iMsg Integer hoReceiver Integer bEnumerate Integer iSomeValue Returns Handle
+51252>>>>>>>//            Integer i
+51252>>>>>>>//            Integer hoNode
+51252>>>>>>>//            Integer hoNamedNodeMap
+51252>>>>>>>//            Integer hinfcNamedNodeMap
+51252>>>>>>>//            Integer iLength
+51252>>>>>>>
+51252>>>>>>>//            Get phEntities To hinfcNamedNodeMap
+51252>>>>>>>
+51252>>>>>>>//            showln "The interface of the named node map is " hinfcNamedNodeMap
+51252>>>>>>>
+51252>>>>>>>//            If (hinfcNamedNodeMap <> 0) Begin
+51252>>>>>>>//                Get CreateXMLObject U_cXMLDOMNamedNodeMap hinfcNamedNodeMap to hoNamedNodeMap
+51252>>>>>>>//                Get piLength Of hoNamedNodeMap To iLength
+51252>>>>>>>//                Showln "There are " iLength " items in map"
+51252>>>>>>>
+51252>>>>>>>//                ///                For i From 0 To (NodeListLength(hoNamedNodeMap)-1)
+51252>>>>>>>//                ///                    // For each record, process its fields.
+51252>>>>>>>//                //                    Get CollectionNode Of hoNamedNodeMap i To hoNode
+51252>>>>>>>//                //                    Send iMsg Of hoReceiver hoNode bEnumerate iSomeValue
+51252>>>>>>>//                //                    Send Destroy_Object Of hoNode
+51252>>>>>>>//                //                Loop
+51252>>>>>>>//            End
+51252>>>>>>>//            Send Destroy To hoNamedNodeMap
+51252>>>>>>>//            Function_Return 0
+51252>>>>>>>//        End_Function
+51252>>>>>>>
+51252>>>>>>>//        Function EnumerateNotations Integer iMsg Integer hoReceiver Integer bEnumerate Integer iSomeValue Returns Handle
+51252>>>>>>>//            Integer i
+51252>>>>>>>//            Integer hoNode
+51252>>>>>>>//            Integer hoNamedNodeMap
+51252>>>>>>>//            Integer hinfcNamedNodeMap
+51252>>>>>>>//            Integer iLength
+51252>>>>>>>
+51252>>>>>>>//            Object oNamedNodeMap Is A cXMLDOMNamedNodeMap
+51252>>>>>>>//                Move Self To hoNamedNodeMap
+51252>>>>>>>//            End_Object
+51252>>>>>>>
+51252>>>>>>>//            Get phNotations To hinfcNamedNodeMap
+51252>>>>>>>
+51252>>>>>>>//            showln "The interface of the named node map is " hinfcNamedNodeMap
+51252>>>>>>>
+51252>>>>>>>//            If (hinfcNamedNodeMap <> 0) Begin
+51252>>>>>>>//                Set XMLInterface Of hoNamedNodeMap To hinfcNamedNodeMap
+51252>>>>>>>//                Get piLength Of hoNamedNodeMap To iLength
+51252>>>>>>>//                Showln "There are " iLength " items in map"
+51252>>>>>>>
+51252>>>>>>>/////                For i From 0 To (NodeListLength(hoNamedNodeMap)-1)
+51252>>>>>>>/////                    // For each record, process its fields.
+51252>>>>>>>////                    Get CollectionNode Of hoNamedNodeMap i To hoNode
+51252>>>>>>>////                    Send iMsg Of hoReceiver hoNode bEnumerate iSomeValue
+51252>>>>>>>////                    Send Destroy_Object Of hoNode
+51252>>>>>>>////                Loop
+51252>>>>>>>//            End
+51252>>>>>>>//            Send Destroy_Object To hoNamedNodeMap
+51252>>>>>>>//            Function_Return 0
+51252>>>>>>>//        End_Function
+51252>>>>>>>
+51252>>>>>>>End_Class
+51253>>>>>>>
+51253>>>>>>>Class cXMLDOMNotation Is A BaseXmlDomNotation
+51254>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51255>>>>>>>End_Class
+51256>>>>>>>
+51256>>>>>>>Class cXMLDOMEntity Is A BaseXmlDomEntity
+51257>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51258>>>>>>>End_Class
+51259>>>>>>>
+51259>>>>>>>Class cXMLDOMEntityReference Is A BaseXmlDomEntityReference
+51260>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51261>>>>>>>End_Class
+51262>>>>>>>
+51262>>>>>>>Class cXMLDOMDocumentFragment Is A BaseXmlDomDocumentFragment
+51263>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51264>>>>>>>End_Class
+51265>>>>>>>
+51265>>>>>>>
+51265>>>>>>>
+51265>>>>>>>// Base document class with Base functions.
+51265>>>>>>>
+51265>>>>>>>Class cXMLDOMDocument is An BaseXmlDomDocument
+51266>>>>>>>
+51266>>>>>>>    Import_Class_protocol cXMLDOMNodeMixin
+51267>>>>>>>
+51267>>>>>>>    Procedure Construct_Object
+51269>>>>>>>        Forward Send Construct_Object
+51271>>>>>>>        Property String psDocumentName ""
+51272>>>>>>>        Property integer phPrivateDocumentElement 0
+51273>>>>>>>    End_Procedure
+51274>>>>>>>
+51274>>>>>>>    // returns the classId for the passed NodeType. This is a good augmentation point. All nodes
+51274>>>>>>>    // within an xml document come here to get a class. So, if you want to augment and return a
+51274>>>>>>>    // different class, just check the node type and return whatever -- else forward
+51274>>>>>>>
+51274>>>>>>>    Function NodeClassId integer iType returns integer
+51276>>>>>>>        integer iClassId
+51276>>>>>>>        Case Begin
+51276>>>>>>>            Case (iType=NODE_ELEMENT)                   Move U_cXMLDOMElement      to iClassId
+51279>>>>>>>            Case (iType=NODE_ATTRIBUTE)                 Move U_cXMLDOMAttribute    to iClassId
+51283>>>>>>>            Case (iType=NODE_TEXT)                      Move U_cXMLDOMTextNode     to iClassId
+51287>>>>>>>            Case (iType=NODE_CDATA_SECTION)             Move U_cXMLDOMCDATASection to iClassId
+51291>>>>>>>            Case (iType=NODE_ENTITY_REFERENCE)          Move U_cXMLDOMEntityReference to iClassId
+51295>>>>>>>            Case (iType=NODE_ENTITY)                    Move U_cXMLDOMEntity       to iClassId
+51299>>>>>>>            Case (iType=NODE_PROCESSING_INSTRUCTION)    Move U_cXMLDOMProcessingInstruction to iClassId
+51303>>>>>>>            Case (iType=NODE_COMMENT)                   Move U_cXMLDOMComment      to iClassId
+51307>>>>>>>            Case (iType=NODE_DOCUMENT)                  Move U_cXMLDOMDocument     to iClassId
+51311>>>>>>>            Case (iType=NODE_DOCUMENT_TYPE)             Move U_cXMLDOMDocumentType to iClassId
+51315>>>>>>>            Case (iType=NODE_DOCUMENT_FRAGMENT)         Move U_cXMLDOMDocumentFragment to iClassId
+51319>>>>>>>            Case (iType=NODE_NOTATION)                  Move U_cXMLDOMNotation     to iClassId
+51323>>>>>>>            Case (iType=0)                              Move 0                     to iClassId // this is an error!!
+51327>>>>>>>            Case Else                                   Move U_cXMLDOMNode         to iClassId
+51329>>>>>>>        Case End
+51329>>>>>>>        Function_return iClassId
+51330>>>>>>>    end_function
+51331>>>>>>>
+51331>>>>>>>    // Load an XML Document. The name of the document is stored in a property
+51331>>>>>>>    // that must be set for this function to work correctly.
+51331>>>>>>>
+51331>>>>>>>    Function LoadXMLDocument Returns Integer
+51333>>>>>>>        String sDocumentName
+51333>>>>>>>        Integer bRetVal
+51333>>>>>>>        Get psDocumentName To sDocumentName
+51334>>>>>>>        Get LoadDocument sDocumentName To bRetVal
+51335>>>>>>>        If (bRetVal = 0);            Function_Return TRUE
+51338>>>>>>>        Else;            Function_Return FALSE
+51340>>>>>>>    End_Function
+51341>>>>>>>
+51341>>>>>>>    Function SaveXMLDocument Returns Integer
+51343>>>>>>>        String sDocumentName
+51343>>>>>>>        Integer bRetVal
+51343>>>>>>>        Get psDocumentName To sDocumentName
+51344>>>>>>>        Get SaveDocument sDocumentName To bRetVal
+51345>>>>>>>        Function_Return bRetVal
+51346>>>>>>>    End_Function
+51347>>>>>>>
+51347>>>>>>>    // Load an XML from a string. This aguments the C message to ret 1 if Ok and 0 if error.
+51347>>>>>>>    //
+51347>>>>>>>    Function LoadXML string sXML Returns Integer
+51349>>>>>>>        Integer bRetVal
+51349>>>>>>>        // for some reason the parser will not work properly with embedded double quotes.
+51349>>>>>>>        // Change all " to ' in document.
+51349>>>>>>>        //Move (replaces('"',sXML,"'")) to sXML  // removed this. Bad Idea.
+51349>>>>>>>        Forward Get LoadXml sXML To bRetVal
+51351>>>>>>>        If (bRetVal = 0) ;            Function_Return TRUE
+51354>>>>>>>        Else;            Function_Return FALSE
+51356>>>>>>>    End_Function
+51357>>>>>>>
+51357>>>>>>>    // Load an XML string from an address. This aguments the C message to ret 1 if Ok and 0 if error.
+51357>>>>>>>    //
+51357>>>>>>>    Function LoadXMLFromAddress address pXML Returns Integer
+51359>>>>>>>        Integer bRetVal
+51359>>>>>>>        Forward Get LoadXmlFromAddress pXML To bRetVal
+51361>>>>>>>        If (bRetVal = 0) ;            Function_Return TRUE
+51364>>>>>>>        Else;            Function_Return FALSE
+51366>>>>>>>    End_Function
+51367>>>>>>>
+51367>>>>>>>
+51367>>>>>>>    // Allow Nodes and Node node lists to get the parent document.
+51367>>>>>>>
+51367>>>>>>>    Function DocumentObject Returns Handle
+51369>>>>>>>        Function_Return self
+51370>>>>>>>    End_Function
+51371>>>>>>>
+51371>>>>>>>    // Access to the root node allows for searches and iterations.
+51371>>>>>>>    // The root node is a cNode.
+51371>>>>>>>
+51371>>>>>>>    Function DocumentElement Returns Handle
+51373>>>>>>>        Integer hNewNode       // Object ID of Root Node
+51373>>>>>>>        Integer infcNode   // XML Element Interface
+51373>>>>>>>// we used to buffer this so we'd always return the same object. This is dangerous. If the devloper
+51373>>>>>>>// deletes the root and then creates some other object with this name, we will have problems. Now we
+51373>>>>>>>// always create a new root now - which means you can create multiple roots (which is probably ok).
+51373>>>>>>>
+51373>>>>>>>//        Get phPrivateDocumentElement to hNewNode
+51373>>>>>>>//        // if for some reason the developer sends destroy to the root element then
+51373>>>>>>>//        // we must check that acutally exists. If not, create the root all over again
+51373>>>>>>>//        Get Object_Id of hNewNode to hNewNode // if Object no longer exists, 0 is returned
+51373>>>>>>>//        If not (hNewNode) Begin
+51373>>>>>>>//            // Call XML to get the document root element.
+51373>>>>>>>//            Get phDocumentElement To infcNode
+51373>>>>>>>//            If infcNode Begin
+51373>>>>>>>//                Get CreateXMLObject U_cXMLDOMElement infcNode to hNewNode
+51373>>>>>>>//                Set phPrivateDocumentElement to hNewNode
+51373>>>>>>>//            end
+51373>>>>>>>//        End
+51373>>>>>>>
+51373>>>>>>>        Get phDocumentElement To infcNode
+51374>>>>>>>        If infcNode Begin
+51376>>>>>>>            Get CreateXMLObject U_cXMLDOMElement infcNode to hNewNode
+51377>>>>>>>            Set phPrivateDocumentElement to hNewNode // we no longer use this at all
+51378>>>>>>>        end
+51378>>>>>>>>
+51378>>>>>>>        Function_Return hNewNode
+51379>>>>>>>    End_Function
+51380>>>>>>>
+51380>>>>>>>    //  CreateRootNode is used to set up the first element in a document.
+51380>>>>>>>    //  It should only be used when creating new files.
+51380>>>>>>>
+51380>>>>>>>    Function CreateDocumentElement String sTagName Returns Handle
+51382>>>>>>>        Integer hNewNode       // Object ID of Root Node
+51382>>>>>>>        Integer infcNode   // XML Element Interface
+51382>>>>>>>        // Call XML to create an element in the document.
+51382>>>>>>>        Get CreateElement sTagName To infcNode
+51383>>>>>>>        // Tie the element interface to the DataFlex object.
+51383>>>>>>>        If infcNode ;            Get CreateXMLObject U_cXMLDOMElement infcNode to hNewNode
+51386>>>>>>>        // Call XML to set the root element of the document.
+51386>>>>>>>        Set phDocumentElement To infcNode
+51387>>>>>>>        Set phPrivateDocumentElement to hNewNode
+51388>>>>>>>        Function_Return hNewNode
+51389>>>>>>>    End_Function
+51390>>>>>>>
+51390>>>>>>>    //(new)
+51390>>>>>>>    Function CreateDocumentElementNS string sNamespace String sTagName Returns Handle
+51392>>>>>>>        Integer hNewNode       // Object ID of Root Node
+51392>>>>>>>        Integer infcNode iType  // XML Element Interface
+51392>>>>>>>        Get CreateElementNodeNS sNameSpace sTagName "" to hNewNode
+51393>>>>>>>        Get XmlInterface of hNewNode to infcNode
+51394>>>>>>>        Set phDocumentElement To infcNode
+51395>>>>>>>        Set phPrivateDocumentElement to hNewNode
+51396>>>>>>>        Function_Return hNewNode
+51397>>>>>>>    End_Function
+51398>>>>>>>
+51398>>>>>>>
+51398>>>>>>>
+51398>>>>>>>    // return the DocType as a document-type object. Returns 0 if no dtd
+51398>>>>>>>    // Access to information from the doc type object is limited. Use get psXML
+51398>>>>>>>    Function DocTypeNode returns handle
+51400>>>>>>>        handle hinfcDocType hoDocType
+51400>>>>>>>        get phDocType to hinfcDocType
+51401>>>>>>>        If hinfcDocType ;            Get CreateXMLObject U_cXMLDOMDocumentType hinfcDocType to hoDocType
+51404>>>>>>>        Function_return hoDocType
+51405>>>>>>>    End_function
+51406>>>>>>>
+51406>>>>>>>    Function phXMLErrorObject Returns Handle
+51408>>>>>>>        Integer hoParseErrorObject
+51408>>>>>>>        Integer hInfcParseError
+51408>>>>>>>        Get phParseError To hInfcParseError
+51409>>>>>>>        If hInfcParseError ;            Get CreateXMLObject U_BaseXMLDOMParseError hinfcParseError to hoParseErrorObject
+51412>>>>>>>        Function_Return hoParseErrorObject
+51413>>>>>>>    End_Function
+51414>>>>>>>
+51414>>>>>>>    //  The following procedure is meant to be overridden by one provided by the developer.
+51414>>>>>>>
+51414>>>>>>>    Procedure BasicParseErrorReport
+51416>>>>>>>        String sProblem
+51416>>>>>>>        String sLinePosition
+51416>>>>>>>        String sDescr
+51416>>>>>>>        String sReason
+51416>>>>>>>        String sSource
+51416>>>>>>>        Integer hoParseErrorObject
+51416>>>>>>>        Get phXMLErrorObject To hoParseErrorObject
+51417>>>>>>>        If hoParseErrorObject Begin
+51419>>>>>>>            Move (SFormat(C_$CannotLoad, psDocumentName(Self)) + "."+character(13)+character(10)) To sProblem
+51420>>>>>>>            Move (SFormat(C_$ParsingError, piLine(hoParseErrorObject), piLinePos(hoParseErrorObject))) To sLinePosition
+51421>>>>>>>            Move (sLinePosition +character(13)+character(10)) To sLinePosition
+51422>>>>>>>
+51422>>>>>>>            Move (C_$Reason + ":" * (psReason(hoParseErrorObject))  +character(13)+character(10)) To sReason
+51423>>>>>>>            Move (C_$Source + ":" * (psSrcText(hoParseErrorObject))) To sSource
+51424>>>>>>>            Move (sProblem + sLinePosition + sReason + sSource) To sDescr
+51425>>>>>>>            Error DFERR_XML_INTERNAL_ERROR sDescr
+51426>>>>>>>>
+51426>>>>>>>            Send Destroy of hoParseErrorObject
+51427>>>>>>>        End
+51427>>>>>>>>
+51427>>>>>>>        else ;            Error DFERR_XML_INTERNAL_ERROR C_$NotCreatedParseObject
+51429>>>>>>>    End_Procedure
+51430>>>>>>>
+51430>>>>>>>End_Class
+51431>>>>>
+51431>>>>>Object oCrystalReporter is a BusinessProcess
+51433>>>>>    Property Handle phProgressNotifier 0
+51435>>>>>    Property String psFolderName 
+51437>>>>>    
+51437>>>>>    Procedure UpdateProgress String sProgress
+51440>>>>>        If ((phProgressNotifier(Self))=0) Showln sProgress 
+51444>>>>>        Else Send UpdateProgress to (phProgressNotifier(Self)) sProgress
+51446>>>>>    End_Procedure
+51447>>>>>
+51447>>>>>    //This is the bit which converts the report structure to XML.
+51447>>>>>    //I'm amazed this has to be done manually. 
+51447>>>>>    Procedure ReportStruct2XML tXMLCrystalReport ReportStruct Handle hXMLNode
+51450>>>>>        Send AddElement of (hXMLNode) "LastEdit" ReportStruct.LastEditedBy
+51451>>>>>        Send AddElement of (hXMLNode) "ReportName" ReportStruct.ReportName
+51452>>>>>    End_Procedure
+51453>>>>>
+51453>>>>>    Procedure ProcessSingleReport String sReportName 
+51456>>>>>        tXMLCrystalReport ReportStruct
+51456>>>>>        tXMLCrystalReport ReportStruct
+51456>>>>>        Handle hoXMLDocument hoRoot
+51456>>>>>        Integer iError
+51456>>>>>        
+51456>>>>>        Send UpdateProgress ("Process report file: "+sReportName)
+51457>>>>>        Get ReportDetail of oReportNotifier sReportName to ReportStruct
+51458>>>>>        
+51458>>>>>        Get Create U_cXMLDomDocument to hoXMLDocument
+51459>>>>>        Get CreateDocumentElement of hoXMLDocument "CrystalReport" to hoRoot
+51460>>>>>        Send ReportStruct2XML ReportStruct hoRoot
+51461>>>>>        
+51461>>>>>        Set psDocumentName of hoXMLDocument to (sReportName+".XML")
+51462>>>>>        Get SaveXmlDocument of hoXMLDocument to iError
+51463>>>>>        If (iError<>0) Begin 
+51465>>>>>            Send UpdateProgress ("Error creating XML File: "+sReportName)
+51466>>>>>        End
+51466>>>>>>
+51466>>>>>        Send Destroy to hoXMLDocument
+51467>>>>>    End_Procedure
+51468>>>>>    
+51468>>>>>    Procedure OnProcess
+51471>>>>>        String sFolderName 
+51471>>>>>        Integer iCH
+51471>>>>>        String sFileName
+51471>>>>>        String sXMLFile 
+51471>>>>>        Boolean isReportOK 
+51471>>>>>        
+51471>>>>>        Get psFolderName to sFolderName 
+51472>>>>>        If ((Right(sFolderName,1))<>"\") Append sFolderName "\"
+51475>>>>>
+51475>>>>>        Send UpdateProgress ("Report Folder: "+sFolderName)
+51476>>>>>        
+51476>>>>>        Get Seq_New_Channel to iCh  
+51477>>>>>        Direct_Input channel iCH ("DIR:"+sFolderName+"a*.rpt")
+51479>>>>>        Repeat
+51479>>>>>>
+51479>>>>>            Readln channel iCH sFileName
+51481>>>>>            Move (True) to isReportOK
+51482>>>>>            
+51482>>>>>            If (sFileName = "") Begin 
+51484>>>>>                Move (False) to isReportOK 
+51485>>>>>            End
+51485>>>>>>
+51485>>>>>
+51485>>>>>            If (isReportOK) Begin 
+51487>>>>>                Move (sFolderName+sFileName+".XML") to sXMLFile 
+51488>>>>>                If (vFilePathExists(sXMLFile)) Begin 
+51490>>>>>                    Send UpdateProgress ("XML File already exists ["+sXMLFile+"]")
+51491>>>>>                    Move (False) to isReportOK 
+51492>>>>>                End
+51492>>>>>>
+51492>>>>>            End
+51492>>>>>>
+51492>>>>>            
+51492>>>>>            If (isReportOK) Begin 
+51494>>>>>                Send ProcessSingleReport (sFolderName+sFileName)
+51495>>>>>            End
+51495>>>>>>
+51495>>>>>        Until (SeqEof)
+51497>>>>>        Close_Input channel iCH
+51499>>>>>    End_Procedure
+51500>>>>>
+51500>>>>>End_Object
+51501>>>>>
+51501>>>
+51501>>>Deferred_View Activate_oExportToXML for ;Object oExportToXML is a dbView
+51526>>>
+51526>>>    Set Border_Style to Border_Thick
+51527>>>    Set Size to 283 443
+51528>>>    Set Location to 2 2
+51529>>>    Set Label to "Export .RPT Files as .XML"
+51530>>>
+51530>>>    Object oGroup1 is a Group
+51532>>>        Set Size to 51 433
+51533>>>        Set Location to 6 5
+51534>>>        Set Label to "Initial Folder:"
+51535>>>
+51535>>>        Object frmDirectory is a Form
+51537>>>            Set Size to 13 215
+51538>>>            Set Location to 13 88
+51539>>>            Set Label to "Report Folder : "
+51540>>>        End_Object
+51541>>>
+51541>>>        Object btnConvert is a Button
+51543>>>            Set Size to 14 141
+51544>>>            Set Location to 30 88
+51545>>>            Set Label to "Save .RPT File Format as .XML"
+51546>>>        
+51546>>>            Procedure OnClick
+51549>>>                Set phProgressNotifier of oCrystalReporter to (grpInformation(Self)) 
+51550>>>                Set psFolderName of oCrystalReporter to (Value(frmDirectory))
+51551>>>                Send DoProcess to oCrystalReporter 
+51552>>>            End_Procedure
+51553>>>        
+51553>>>        End_Object
+51554>>>    End_Object
+51555>>>
+51555>>>    Object grpInformation is a Group
+51557>>>        Set Size to 158 432
+51558>>>        Set Location to 66 6
+51559>>>        Set Label to "Information:"
+51560>>>
+51560>>>        Object txtProgress is a cTextEdit
+51562>>>            Set Size to 137 417
+51563>>>            Set Location to 14 9
+51564>>>        End_Object
+51565>>>        
+51565>>>        Procedure updateProgress String sValue 
+51568>>>            Send AppendText of txtProgress (sValue+(character(10)))
+51569>>>        End_Procedure
+51570>>>        
+51570>>>    End_Object
+51571>>>
+51571>>>    Object btnClose is a Button
+51573>>>        Set Size to 14 88
+51574>>>        Set Location to 231 336
+51575>>>        Set Label to "Close"
+51576>>>    
+51576>>>        // fires when the button is clicked
+51576>>>        Procedure OnClick
+51579>>>            Send Close_Panel
+51580>>>        End_Procedure
+51581>>>    
+51581>>>    End_Object
+51582>>>
+51582>>>Cd_End_Object
+51584>>>>
+51584>        Use CrystalReporter.bp
+51584>        Use ReportNotifier.bp
+51584>
+51584>        Procedure Activate_About
+51587>            Send DoAbout "" "" "" "" ""
+51588>        End_Procedure
+51589>
+51589>    End_Object
+51590>
+51590>End_Object
+51591>
+51591>Start_UI
+51592>
 Summary
-Memory Available: 2147483647
+Memory Available: 2086772735
 Total Warnings : 0
 Total Errors   : 0
-Total Symbols  : 29319
+Total Symbols  : 30084
 Total Resources: 0
-Total Commands : 50150
+Total Commands : 51591
 Total Windows  : 1
 Total Pages    : 1
-Static Data    : 327027
-Message area   : 331272
-Total Blocks   : 18385
+Static Data    : 338303
+Message area   : 338642
+Total Blocks   : 18882
